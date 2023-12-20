@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Pasteboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.5s;
+        }
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        textarea {
+            width: 80%;
+            height: 60vh;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            resize: none;
+            transition: background-color 0.5s;
+        }
+        textarea.dark-mode {
+            background-color: #444;
+            color: #fff;
+        }
+        .buttons-box ,.textarea-box {
+            width: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: transparent solid 1px;
+            background-color: transparent;
+            display: list-item;
+            color: #666;
+        }
+        button.dark-mode {
+            border-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="textarea-box">
+        <textarea id="fileContent" placeholder="Paste your content here..."></textarea>
+    </div>
+
+    <div class="buttons-box">
+        <button id="saveFile">Save(Ctrl + S)</button>
+        <!-- copy -->
+        <button id="copyFile">Copy(Ctrl + C)</button>
+        <button id="toggleMode">Dark Mode(Ctrl + B)</button> 
+    </div>
+
+    <script>
+        // Fetch the content of the file
+        fetch('1.txt')
+        .then(response => response.text())
+        .then(data => {
+            // Display the content in the textarea
+            document.getElementById('fileContent').value = data;
+        });
+
+        const button = document.getElementById('toggleMode');
+        button.addEventListener('click', function() {
+            toggleDarkMode();
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.getElementById('fileContent').classList.toggle('dark-mode');
+        }
+
+        // Keyboard event listener for Ctrl + N
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'b') {
+                toggleDarkMode();
+            }
+        });
+    </script>
+</body>
+</html>
