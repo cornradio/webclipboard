@@ -37,15 +37,26 @@
             color: #fff;
         }
         .buttons-box ,.textarea-box {
-            width: 80%;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
+        .bigflexbox {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+        }
+        /* Media query for screens smaller than 480px */
+        @media (max-width: 510px) {
+            .bigflexbox {
+                display: flex;
+                flex-direction: column;
+            }   
+        }
         button {
             margin-top: 10px;
-            padding: 5px 10px;
             border: transparent solid 1px;
             background-color: transparent;
             display: list-item;
@@ -58,15 +69,18 @@
 </head>
 
 <body>
-    <div class="textarea-box">
-        <textarea id="fileContent" placeholder="Paste your content here..."></textarea>
-    </div>
+    <div class="bigflexbox">
+        <div class="textarea-box">
+            <textarea id="fileContent" placeholder="Paste your content here..."></textarea>
+        </div>
+    
+        <div class="buttons-box">
+            <button id="saveFile">Save(Ctrl + S)</button>
+            <!-- copy -->
+            <button id="copyFile">Copy(Ctrl + C)</button>
+            <button id="toggleMode">Dark Mode(Ctrl + B)</button> 
+        </div>
 
-    <div class="buttons-box">
-        <button id="saveFile">Save(Ctrl + S)</button>
-        <!-- copy -->
-        <button id="copyFile">Copy(Ctrl + C)</button>
-        <button id="toggleMode">Dark Mode(Ctrl + B)</button> 
     </div>
 
     <script>
