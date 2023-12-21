@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Pasteboard</title>
     <style>
@@ -16,10 +18,12 @@
             height: 100vh;
             transition: background-color 0.5s;
         }
+
         body.dark-mode {
-            background-color: #333;
+            background-color: #2d2d2d;
             color: #fff;
         }
+
         textarea {
             width: 80%;
             height: 60vh;
@@ -32,29 +36,35 @@
             resize: none;
             transition: background-color 0.5s;
         }
+
         textarea.dark-mode {
             background-color: #444;
             color: #fff;
         }
-        .buttons-box ,.textarea-box {
+
+        .buttons-box,
+        .textarea-box {
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
+
         .bigflexbox {
             width: 100%;
             display: flex;
             flex-direction: row;
         }
+
         /* Media query for screens smaller than 480px */
-        @media (max-width: 510px) {
+        @media (max-width: 600px) {
             .bigflexbox {
                 display: flex;
                 flex-direction: column;
-            }   
+            }
         }
+
         button {
             margin-top: 10px;
             border: transparent solid 1px;
@@ -62,6 +72,22 @@
             display: list-item;
             color: #666;
         }
+
+        input {
+            margin-top: 10px;
+            border: transparent solid 1px;
+            font-size: x-large;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: transparent;
+            display: list-item;
+            text-align: center;
+            color: #666;
+        }
+
+        button:active {
+            background-color: #7a7a7a49;
+        }
+
         button.dark-mode {
             border-color: #fff;
         }
@@ -73,41 +99,111 @@
         <div class="textarea-box">
             <textarea id="fileContent" placeholder="Paste your content here..."></textarea>
         </div>
-    
+
         <div class="buttons-box">
+            <input type="text" id="fileName" placeholder="xxx.txt" value="1.txt">
             <button id="saveFile">Save(Ctrl + S)</button>
-            <!-- copy -->
-            <button id="copyFile">Copy(Ctrl + C)</button>
-            <button id="toggleMode">Dark Mode(Ctrl + B)</button> 
+            <button id="loadFile">Load(Ctrl + L)</button>
+            <button id="toggleMode">Dark Mode(Ctrl + B)</button>
         </div>
 
     </div>
 
     <script>
-        // Fetch the content of the file
-        fetch('1.txt')
-        .then(response => response.text())
-        .then(data => {
-            // Display the content in the textarea
-            document.getElementById('fileContent').value = data;
-        });
-
-        const button = document.getElementById('toggleMode');
-        button.addEventListener('click', function() {
+        const toggleButton = document.getElementById('toggleMode');
+        toggleButton.addEventListener('click', function () {
             toggleDarkMode();
         });
-
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             document.getElementById('fileContent').classList.toggle('dark-mode');
         }
 
-        // Keyboard event listener for Ctrl + N
-        document.addEventListener('keydown', function(event) {
+        const saveButton = document.getElementById('saveFile');
+        saveButton.addEventListener('click', function () {
+            const fileName = document.getElementById('fileName').value;
+            const content = document.getElementById('fileContent').value;
+
+            const data = {
+                content: content
+            };
+
+            fetch(`http://127.0.0.1:3000/api/writefile/${fileName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('文件内容已成功保存');
+                    } else {
+                        console.error('保存文件内容时出错');
+                    }
+                })
+                .catch(error => {
+                    console.error('保存文件内容时出错', error);
+                });
+        });
+
+        const loadButton = document.getElementById('loadFile');
+        loadButton.addEventListener('click', function () {
+            const fileName = document.getElementById('fileName').value;
+            load(fileName);
+        });
+        function load(txtname) {
+            fetch('http://127.0.0.1:3000/api/readfile/' + txtname)
+                .then(response => response.text())
+                .then(data => {
+                    // Display the content in the textarea
+                    document.getElementById('fileContent').value = data;
+                });
+        }
+
+        // Keyboard event listener 
+        document.addEventListener('keydown', function (event) {
             if (event.ctrlKey && event.key === 'b') {
                 toggleDarkMode();
             }
         });
+        document.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 's') {
+                saveButton.click();
+            }
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'l') {
+                loadButton.click();
+            }
+        });
+
+        function loadEmojiIcon(curEmoji) {
+            //将网页图标改成emoji curEmoji
+            const favicon = document.querySelector('link[rel="icon"]');
+            // favicon.href = `https://www.emojiall.com/en/header-svg/${curEmoji}.svg`;
+            favicon.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${curEmoji}</text></svg>`;
+        }
+
+
+        // 自动保存文件名框
+        var fileNameInput = document.getElementById('fileName');
+        fileNameInput.onchange = function () {
+            var fileName = fileNameInput.value;
+            localStorage.setItem('fileName', fileName);
+            console.log('文件内容已存储到 localStorage: ' + fileName);
+        };
+        // 页面加载时 加载文件名框
+        window.onload = function () {
+            var storedFileContent = localStorage.getItem('fileName');
+            if (storedFileContent) {
+                fileNameInput.value = storedFileContent;
+                console.log('从 localStorage 加载文件内容: ' + storedFileContent);
+            }
+            load(fileName.value)
+            loadEmojiIcon('📋')
+        };
     </script>
 </body>
+
 </html>

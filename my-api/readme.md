@@ -1,12 +1,13 @@
-# how to run
+# first run
 
-insatll node
+install node
 ```bash
 sudo apt install nodejs
 ```
 install dependencies
 ```bash
 npm install express
+npm install cors
 ```
 
 run
@@ -14,7 +15,14 @@ run
 node api.js
 ```
 
-## how to use use api
+# normal run 
+use screen
+```bash
+screen -S webPasteApi
+node api.js
+```
+
+# api
 Get
 ```
 http://127.0.0.1:3000/api/readfile/{any.txt}

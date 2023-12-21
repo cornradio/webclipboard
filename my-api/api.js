@@ -1,5 +1,7 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
+app.use(cors()); // 允许跨域请求
 const port = 3000;
 
 const filemanager = require('./filemanager');
@@ -16,6 +18,7 @@ app.get('/api/readfile/:fileName', (req, res) => {
     }
 
     // 读取文件内容
+    console.log(`Reading file ${fileName}...`);
     const content = filemanager.readFile(fileName);
     res.send(content);
 });
