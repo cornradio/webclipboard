@@ -1,8 +1,10 @@
-# how to use
-1. clone this project
-2. open the project in vscode
-3. open with live server
-4. change 1.txt == cange the text in the browser
-5. `ipconfig /all |findstr IPv4` , 192.168.31.10:5500 open on your phone
+## 在线剪切板
+使用方法：
+1. git clone 本项目到服务器的 nginx 目录下 （如 /var/www/html）
+2. 按照 [api-readme](/my-api/readme.md) 启动 `nodejs` api服务器，会使用3000端口
 
-![Alt text](image.png)
+## 截图
+![1](images/image.png)
+<div align="center">
+	<img src="images/image2.jpg" alt="Editor" width="500">
+</div>
