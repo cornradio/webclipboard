@@ -110,6 +110,13 @@
     </div>
 
     <script>
+        //获取当前url
+        var url = window.location.href;
+        //提取url的ip
+        var ip = url.split('/')[2].split('/')[0].split(':')[0];
+        console.log(ip)
+        apiserver = ip
+
         const toggleButton = document.getElementById('toggleMode');
         toggleButton.addEventListener('click', function () {
             toggleDarkMode();
@@ -128,7 +135,7 @@
                 content: content
             };
 
-            fetch(`http://127.0.0.1:3000/api/writefile/${fileName}`, {
+            fetch(`http://${apiserver}:3000/api/writefile/${fileName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -153,7 +160,7 @@
             load(fileName);
         });
         function load(txtname) {
-            fetch('http://127.0.0.1:3000/api/readfile/' + txtname)
+            fetch('http://'+apiserver+':3000/api/readfile/' + txtname)
                 .then(response => response.text())
                 .then(data => {
                     // Display the content in the textarea
