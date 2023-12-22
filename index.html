@@ -42,6 +42,7 @@
             color: #fff;
         }
 
+        /* flex box */
         .buttons-box,
         .textarea-box {
             width: 100%;
@@ -65,6 +66,7 @@
             }
         }
 
+        /* buttons */
         button {
             margin-top: 10px;
             border: transparent solid 1px;
@@ -91,6 +93,63 @@
         button.dark-mode {
             border-color: #fff;
         }
+
+        /* toast */
+        #toastContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .toast {
+            background-color: #f1f1f1;
+            border: 1px solid #afafaf;
+            color: #000000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            font-size:smaller;
+            padding: 5px 10px;
+            border-radius: 100px;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: float-in 0.3s ease-in-out;
+            /* transition: 0.3s ease-in-out; */
+        }
+
+        .toast.dark-mode {
+            background-color: #444;
+            border: 1px solid #2d2d2d;
+            color: #d8d8d8;
+        }
+
+        .toast.show {
+            opacity: 0.8;
+        }
+
+        .toast.hide {
+            animation: slide-out 0.5s ease-in-out;
+        }
+
+        @keyframes float-in {
+            0% {
+                transform: translateY(20px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slide-out {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -107,6 +166,9 @@
             <button id="toggleMode">Dark Mode(Ctrl + B)</button>
         </div>
 
+    <div id="toastContainer"></div>
+
+
     </div>
 
     <script>
@@ -114,16 +176,22 @@
         var url = window.location.href;
         //提取url的ip
         var ip = url.split('/')[2].split('/')[0].split(':')[0];
-        console.log(ip)
+        console.log("从 url 获取服务器 ip: " + ip)
         apiserver = ip
 
         const toggleButton = document.getElementById('toggleMode');
         toggleButton.addEventListener('click', function () {
             toggleDarkMode();
+            saveDarkMode();
         });
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             document.getElementById('fileContent').classList.toggle('dark-mode');
+        }
+        function saveDarkMode() {
+            var darkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', darkMode);
+            console.log('Dark mode saved to localStorage: ' + darkMode);
         }
 
         const saveButton = document.getElementById('saveFile');
@@ -142,16 +210,18 @@
                 },
                 body: JSON.stringify(data)
             })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('文件内容已成功保存');
-                    } else {
-                        console.error('保存文件内容时出错');
-                    }
-                })
-                .catch(error => {
-                    console.error('保存文件内容时出错', error);
-                });
+            .then(response => {
+                if (response.ok) {
+                    console.log('文件内容已成功保存');
+                    showToast('Save ok',document.body.classList.contains('dark-mode'));
+                } else {
+                    console.error('保存文件内容时出错');
+                }
+            })
+            .catch(error => {
+                console.error('保存文件内容时出错', error);
+            });
+
         });
 
         const loadButton = document.getElementById('loadFile');
@@ -160,31 +230,30 @@
             load(fileName);
         });
         function load(txtname) {
-            fetch('http://'+apiserver+':3000/api/readfile/' + txtname)
+            fetch('http://' + apiserver + ':3000/api/readfile/' + txtname)
                 .then(response => response.text())
                 .then(data => {
                     // Display the content in the textarea
                     document.getElementById('fileContent').value = data;
+                    showToast('Load ok', document.body.classList.contains('dark-mode'));
                 });
         }
 
         // Keyboard event listener 
         document.addEventListener('keydown', function (event) {
             if (event.ctrlKey && event.key === 'b') {
+                event.preventDefault();
                 toggleDarkMode();
             }
-        });
-        document.addEventListener('keydown', function (event) {
             if (event.ctrlKey && event.key === 's') {
+                event.preventDefault();
                 saveButton.click();
             }
-        });
-        document.addEventListener('keydown', function (event) {
             if (event.ctrlKey && event.key === 'l') {
+                event.preventDefault();
                 loadButton.click();
             }
         });
-
         function loadEmojiIcon(curEmoji) {
             //将网页图标改成emoji curEmoji
             const favicon = document.querySelector('link[rel="icon"]');
@@ -192,22 +261,55 @@
             favicon.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${curEmoji}</text></svg>`;
         }
 
+        // Toast
+        function showToast(textContent, darkMode) {
+            var toast = document.createElement('div');// 创建Toast元素
+            toast.classList.add('toast');
+            toast.textContent = textContent;
 
-        // 自动保存文件名框
+            var container = document.getElementById('toastContainer');// 将Toast添加到容器中
+            container.appendChild(toast);
+
+            if (darkMode) {
+                toast.classList.toggle('dark-mode');// 设置深色模式
+            }
+
+            setTimeout(function () {// 显示Toast
+                toast.classList.add('show');
+            }, 30);
+
+            setTimeout(function () {// 隐藏Toast
+                toast.classList.add('hide');
+                setTimeout(function () {
+                    container.removeChild(toast);
+                }, 300);
+            }, 1000);
+        }
+
+
+        // 自动保存文件名框 到 localStorage
         var fileNameInput = document.getElementById('fileName');
         fileNameInput.onchange = function () {
             var fileName = fileNameInput.value;
             localStorage.setItem('fileName', fileName);
             console.log('文件内容已存储到 localStorage: ' + fileName);
+            load(fileName)
         };
-        // 页面加载时 加载文件名框
+        // 页面加载时 
         window.onload = function () {
+            //加载文件名框
             var storedFileContent = localStorage.getItem('fileName');
             if (storedFileContent) {
                 fileNameInput.value = storedFileContent;
-                console.log('从 localStorage 加载文件内容: ' + storedFileContent);
+                console.log('从 localStorage 加载文件名: ' + storedFileContent);
             }
             load(fileName.value)
+            //加载暗黑模式
+            var storedDarkMode = localStorage.getItem('darkMode');
+            console.log('从 localStorage 加载暗黑模式: ' + storedDarkMode);
+            if (storedDarkMode == 'true') {
+                toggleDarkMode();
+            }
             loadEmojiIcon('📋')
         };
     </script>
