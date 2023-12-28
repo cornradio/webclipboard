@@ -13,7 +13,9 @@ app.get('/api/readfile/:fileName', (req, res) => {
     let result = filter.check(fileName);
     if(result=='ok'){
         // 读取文件内容
-        console.log(`Reading file ${fileName}...`);
+        var time = new Date().toLocaleString();
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        console.log(`${time} ${ip} Reading file ${fileName}...`);
         const content = filemanager.readFile(fileName);
         res.send(content);
     }else{
@@ -29,6 +31,9 @@ app.post('/api/writefile/:fileName', (req, res) => {
     let result = filter.check(fileName);
     if(result=='ok'){
         // 读取文件内容
+        var time = new Date().toLocaleString();
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        console.log(`${time} ${ip} Writing file ${fileName}...`);
         filemanager.writeFile(fileName, content);
         // 写入文件内容
         res.send('OK');
