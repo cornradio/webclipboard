@@ -15,6 +15,7 @@ app.get('/api/readfile/:fileName', (req, res) => {
         // 读取文件内容
         var time = new Date().toLocaleString();
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        ip = ip.replace('::ffff:', '');
         console.log(`${time} ${ip} Reading file ${fileName}...`);
         const content = filemanager.readFile(fileName);
         res.send(content);
@@ -33,6 +34,7 @@ app.post('/api/writefile/:fileName', (req, res) => {
         // 读取文件内容
         var time = new Date().toLocaleString();
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        ip = ip.replace('::ffff:', '');
         console.log(`${time} ${ip} Writing file ${fileName}...`);
         filemanager.writeFile(fileName, content);
         // 写入文件内容
