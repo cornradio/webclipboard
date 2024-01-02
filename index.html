@@ -29,7 +29,7 @@
             height: 60vh;
             font-size: 16px;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #fff;
             border-radius: 5px;
             background-color: #fff;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -40,6 +40,17 @@
         textarea.dark-mode {
             background-color: #444;
             color: #fff;
+            border: 1px solid #555;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+        }
+
+        ::selection {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ffee;
         }
 
         /* flex box */
@@ -76,14 +87,18 @@
         }
 
         input {
+            font-family: 'cascadia mono', 'Courier New', Courier, monospace;
             margin-top: 10px;
             border: transparent solid 1px;
             font-size: x-large;
-            font-family: 'Courier New', Courier, monospace;
             background-color: transparent;
             display: list-item;
             text-align: center;
             color: #666;
+        }
+
+        textarea {
+            font-family: 'cascadia mono', 'Courier New', Courier, monospace;
         }
 
         button:active {
@@ -108,7 +123,7 @@
             border: 1px solid #afafaf;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            font-size:smaller;
+            font-size: smaller;
             padding: 5px 10px;
             border-radius: 100px;
             margin-bottom: 10px;
@@ -135,6 +150,7 @@
             0% {
                 transform: translateY(20px);
             }
+
             100% {
                 transform: translateY(0);
             }
@@ -166,7 +182,7 @@
             <button id="toggleMode">Dark Mode(Ctrl + B)</button>
         </div>
 
-    <div id="toastContainer"></div>
+        <div id="toastContainer"></div>
 
 
     </div>
@@ -210,17 +226,17 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (response.ok) {
-                    console.log('文件内容已成功保存');
-                    showToast('Save ok',document.body.classList.contains('dark-mode'));
-                } else {
-                    console.error('保存文件内容时出错');
-                }
-            })
-            .catch(error => {
-                console.error('保存文件内容时出错', error);
-            });
+                .then(response => {
+                    if (response.ok) {
+                        console.log('文件内容已成功保存');
+                        showToast('💾 Save ok', document.body.classList.contains('dark-mode'));
+                    } else {
+                        console.error('保存文件内容时出错');
+                    }
+                })
+                .catch(error => {
+                    console.error('保存文件内容时出错', error);
+                });
 
         });
 
@@ -233,9 +249,15 @@
             fetch('http://' + apiserver + ':3000/api/readfile/' + txtname)
                 .then(response => response.text())
                 .then(data => {
+                    // If the file is not found, show a toast and return
+                    if (data == 'file not found') {
+                        showToast('⛔ File not found', document.body.classList.contains('dark-mode'));
+                        return;
+                    }
                     // Display the content in the textarea
                     document.getElementById('fileContent').value = data;
-                    showToast('Load ok', document.body.classList.contains('dark-mode'));
+                    
+                    showToast('♻️ Load ok', document.body.classList.contains('dark-mode'));// Toast match dark mode
                 });
         }
 
