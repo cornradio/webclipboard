@@ -3,9 +3,12 @@
 install node
 ```bash
 sudo apt install nodejs
+sudo apt install npm
 ```
 install dependencies
 ```bash
+sudo -i
+
 npm install express
 npm install cors
 ```
@@ -19,6 +22,7 @@ node api.js
 use screen
 ```bash
 screen -S webPasteApi
+cd /var/www/html/webclipboard/my-api
 node api.js
 ```
 
