@@ -27,7 +27,7 @@
         textarea {
             width: 80%;
             height: 60vh;
-            font-size: 16px;
+            font-size: 14px;
             padding: 10px;
             border: 1px solid #fff;
             border-radius: 5px;
@@ -35,7 +35,19 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             resize: none;
             transition: background-color 0.5s;
+            font-family: 'cascadia mono', monospace;
+            transition: .2s;
+
         }
+
+        textarea.big {
+            width: 130%;
+            height: 90vh;
+            font-size: 14px;
+            transform: translateX(35%);
+            padding: 1em;
+        }
+
 
         textarea.dark-mode {
             background-color: #444;
@@ -48,10 +60,10 @@
             outline: none;
         }
 
-        ::selection {
+        /* ::selection {
             background-color: rgba(0, 0, 0, 0.8);
             color: #00ffee;
-        }
+        } */
 
         /* flex box */
         .buttons-box,
@@ -75,6 +87,10 @@
                 display: flex;
                 flex-direction: column;
             }
+
+            textarea {
+                height: 55vh;
+            }
         }
 
         /* buttons */
@@ -97,9 +113,6 @@
             color: #666;
         }
 
-        textarea {
-            font-family: 'cascadia mono';
-        }
 
         button:active {
             background-color: #7a7a7a49;
@@ -144,6 +157,22 @@
 
         .toast.hide {
             animation: slide-out 0.5s ease-in-out;
+        }
+
+        /* scroll bar css */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00000030;
+            border-radius: 999px;
+            border: 1px solid #ececec59;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #000000;
         }
 
         @keyframes float-in {
@@ -209,6 +238,9 @@
             localStorage.setItem('darkMode', darkMode);
             console.log('Dark mode saved to localStorage: ' + darkMode);
         }
+        function toggleBigMode() {
+            document.getElementById('fileContent').classList.toggle('big');
+        }
 
         const saveButton = document.getElementById('saveFile');
         saveButton.addEventListener('click', function () {
@@ -252,11 +284,12 @@
                     // If the file is not found, show a toast and return
                     if (data == 'file not found') {
                         showToast('⛔ File not found', document.body.classList.contains('dark-mode'));
+                        document.getElementById('fileContent').value = '';
                         return;
                     }
                     // Display the content in the textarea
                     document.getElementById('fileContent').value = data;
-                    
+
                     showToast('♻️ Load ok', document.body.classList.contains('dark-mode'));// Toast match dark mode
                 });
         }
@@ -274,6 +307,10 @@
             if (event.ctrlKey && event.key === 'l') {
                 event.preventDefault();
                 loadButton.click();
+            }
+            if (event.key === 'F11') {
+                event.preventDefault();
+                toggleBigMode();
             }
         });
         function loadEmojiIcon(curEmoji) {
