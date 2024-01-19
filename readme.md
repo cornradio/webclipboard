@@ -11,12 +11,20 @@
 
 ## docker 用法
 
+arm-64
 ```shell
 # 后台模式运行 nodeapi 端口<外部>:<内部默认3000>
 docker run -dp 3000:3000 kasusa/webclipboard-nodeapi:v1.0
 # 后台模式运行 nginx 端口<外部>:<内部默认80> ， -e 设定nginx访问api的端口
 docker run -dp 80:80 -e API_PORT=3000 kasusa/webclipboard-nginx:v1.1
 ```
+
+x64
+```shell
+docker run -dp 3000:3000 kasusa/webclipboard-nodeapi:v1.0-x64
+docker run -dp 80:80 -e API_PORT=3000 kasusa/webclipboard-nginx:v1.1-x64
+```
+
 浏览器访问 `http://<服务器ip>` 即可使用剪切版
 
 ---
