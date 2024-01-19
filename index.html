@@ -223,6 +223,17 @@
         var ip = url.split('/')[2].split('/')[0].split(':')[0];
         console.log("从 url 获取服务器 ip: " + ip)
         apiserver = ip
+        port = '3000' //端口号默认3000
+
+        fetch('apiport.txt')
+            .then(response => response.text())
+            .then(myport => {
+                port = `${myport}`;
+                console.log('apiport.txt -- use api port:'+ port);
+            })
+            .catch(error => {
+                console.log('apiport.txt notfound -- use defult port: 3000 ;');
+            });
 
         const toggleButton = document.getElementById('toggleMode');
         toggleButton.addEventListener('click', function () {
@@ -251,7 +262,7 @@
                 content: content
             };
 
-            fetch(`http://${apiserver}:3000/api/writefile/${fileName}`, {
+            fetch(`http://${apiserver}:${port}/api/writefile/${fileName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -267,9 +278,8 @@
                     }
                 })
                 .catch(error => {
-                    console.error('保存文件内容时出错', error);
+                    showToast('☠️ API dead', document.body.classList.contains('dark-mode'));// Toast match dark mode
                 });
-
         });
 
         const loadButton = document.getElementById('loadFile');
@@ -278,7 +288,7 @@
             load(fileName);
         });
         function load(txtname) {
-            fetch('http://' + apiserver + ':3000/api/readfile/' + txtname)
+            fetch('http://' + apiserver + `:${port}/api/readfile/` + txtname)
                 .then(response => response.text())
                 .then(data => {
                     // If the file is not found, show a toast and return
@@ -291,6 +301,9 @@
                     document.getElementById('fileContent').value = data;
 
                     showToast('♻️ Load ok', document.body.classList.contains('dark-mode'));// Toast match dark mode
+                })
+                .catch(error => {
+                    showToast('☠️ API dead', document.body.classList.contains('dark-mode'));// Toast match dark mode
                 });
         }
 
@@ -344,8 +357,6 @@
                 }, 300);
             }, 1000);
         }
-
-
         // 自动保存文件名框 到 localStorage
         var fileNameInput = document.getElementById('fileName');
         fileNameInput.onchange = function () {
