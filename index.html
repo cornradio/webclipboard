@@ -226,10 +226,16 @@
         port = '3000' //端口号默认3000
 
         fetch('apiport.txt')
-            .then(response => response.text())
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('apiport.txt not found');
+                }
+            })
             .then(myport => {
                 port = `${myport}`;
-                console.log('apiport.txt -- use api port:'+ port);
+                console.log('apiport.txt -- use api port:' + port);
             })
             .catch(error => {
                 console.log('apiport.txt notfound -- use defult port: 3000 ;');
