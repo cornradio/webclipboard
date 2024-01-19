@@ -21,7 +21,7 @@ docker run -dp 80:80 -e API_PORT=3000 kasusa/webclipboard-nginx:v1.1
 
 x64
 ```shell
-docker run -dp 3000:3000 kasusa/webclipboard-nodeapi:v1.0-x64
+docker run -dp 3000:3000 kasusa/webclipboard-nodeapi:v1.1-x64
 docker run -dp 80:80 -e API_PORT=3000 kasusa/webclipboard-nginx:v1.1-x64
 ```
 
