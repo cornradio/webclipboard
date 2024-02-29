@@ -87,6 +87,13 @@
                 display: flex;
                 flex-direction: column;
             }
+            .buttons-box {
+                width: 100%;
+                display: flex;
+            }
+            .hidden_on_iphone{
+                display: none;
+            }
 
             textarea {
                 height: 55vh;
@@ -95,11 +102,18 @@
 
         /* buttons */
         button {
-            margin-top: 10px;
+            margin-top: 8px;
             border: transparent solid 1px;
             background-color: transparent;
             display: list-item;
             color: #666;
+        }
+        /* button hover float hover box */
+        button:hover i{
+            display: inline-block;
+        }
+        button i {
+            display: none;
         }
 
         input {
@@ -203,12 +217,14 @@
         <div class="textarea-box">
             <textarea id="fileContent" placeholder="Paste your content here..."></textarea>
         </div>
-
+        
         <div class="buttons-box">
             <input type="text" id="fileName" placeholder="xxx.txt" value="1.txt">
-            <button id="saveFile">Save(Ctrl + S)</button>
-            <button id="loadFile">Load(Ctrl + L)</button>
-            <button id="toggleMode">Dark Mode(Ctrl + B)</button>
+            <button id="saveFile">Save <i>Ctrl + S</i></button>
+            <button id="loadFile"  class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
+            <button id="CopyAll" onclick="CopyAll()" >Copy <i>Ctrl + shift + C</i></button>
+            <button id="Share" class="hidden_on_iphone" onclick="Share()">Share <i>Ctrl + shift + S</i></button>
+            <button id="toggleMode">Dark Mode <i>Ctrl + B</i></button>
         </div>
 
         <div id="toastContainer"></div>
@@ -258,6 +274,19 @@
         function toggleBigMode() {
             document.getElementById('fileContent').classList.toggle('big');
         }
+        function CopyAll() {
+            document.getElementById('fileContent').select();
+            document.execCommand('copy');
+            showToast('📋 Copied All', document.body.classList.contains('dark-mode'));
+        }
+        function Share(){
+            var shareurl = window.location.href.split('?txt=')[0] + '?txt=' + document.getElementById('fileName').value.split('.')[0];
+            console.log('分享链接: ' + shareurl);
+            navigator.clipboard.writeText(shareurl);
+            // for iphone safari , this button will be hidden
+            showToast('🔗 Copied', document.body.classList.contains('dark-mode'));
+        }
+
 
         const saveButton = document.getElementById('saveFile');
         saveButton.addEventListener('click', function () {
@@ -331,6 +360,16 @@
                 event.preventDefault();
                 toggleBigMode();
             }
+            //savebutton
+            if (event.ctrlKey && event.shiftKey && event.key === 'C') {
+                event.preventDefault();
+                CopyAll();
+            }
+            //sharebutton
+            if (event.ctrlKey && event.shiftKey && event.key === 'S') {
+                event.preventDefault();
+                Share();
+            }
         });
         function loadEmojiIcon(curEmoji) {
             //将网页图标改成emoji curEmoji
@@ -373,8 +412,21 @@
         };
         // 页面加载时 
         window.onload = function () {
+            //如果存在urlparm txt参数，优先加载
+            var queryString = window.location.search;
+            var urlParams = new URLSearchParams(queryString);
+		    var txtParm = urlParams.get('txt');
+            var storedFileContent = '';
+            if (txtParm) {
+                storedFileContent = txtParm + '.txt';
+                console.log('从 txt urlParm 加载文件名: ' + storedFileContent);
+                //设置title
+                document.title = storedFileContent;
+            }
+            else{
+                storedFileContent = localStorage.getItem('fileName');
+            }
             //加载文件名框
-            var storedFileContent = localStorage.getItem('fileName');
             if (storedFileContent) {
                 fileNameInput.value = storedFileContent;
                 console.log('从 localStorage 加载文件名: ' + storedFileContent);
