@@ -223,7 +223,7 @@
             <button id="saveFile">Save <i>Ctrl + S</i></button>
             <button id="loadFile"  class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
             <button id="CopyAll" onclick="CopyAll()" >Copy <i>Ctrl + shift + C</i></button>
-            <button id="Share" class="hidden_on_iphone" onclick="Share()">Share <i>Ctrl + shift + S</i></button>
+            <button id="Share" class="" onclick="Share()">Share <i>Ctrl + shift + S</i></button>
             <button id="toggleMode">Dark Mode <i>Ctrl + B</i></button>
         </div>
 
@@ -282,9 +282,18 @@
         function Share(){
             var shareurl = window.location.href.split('?txt=')[0] + '?txt=' + document.getElementById('fileName').value.split('.')[0];
             console.log('分享链接: ' + shareurl);
-            navigator.clipboard.writeText(shareurl);
+            // if http no s
+            if (window.location.href.split('/')[0] == 'http:'){
+                showToast('🔗 F12 to copy :', document.body.classList.contains('dark-mode'));
+                // alert with copy button
+                prompt("Copy this and Share!", shareurl);
+                // prompt(shareurl + '\nyou can also see this link in console (F12)');
+            }
+            else{
+                navigator.clipboard.writeText(shareurl);
+                showToast('🔗 Copied', document.body.classList.contains('dark-mode'));
+            }
             // for iphone safari , this button will be hidden
-            showToast('🔗 Copied', document.body.classList.contains('dark-mode'));
         }
 
 
