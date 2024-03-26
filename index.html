@@ -7,6 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Pasteboard</title>
     <style>
+        select{
+            position: fixed;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: .3s;
+
+        }
+        select:hover{
+            opacity: 0.8;
+        }
+        #selectOldFile.dark-mode{
+            color: #fff;
+            background-color: #2d2d2d;
+            border: none;
+        }
         body {
             font-family: Arial, sans-serif;
             background-color: #f3f3f3;
@@ -220,6 +236,10 @@
         
         <div class="buttons-box">
             <input type="text" id="fileName" placeholder="xxx.txt" value="1.txt">
+            
+            <select id="selectOldFile">
+            </select>
+
             <button id="saveFile">Save <i>Ctrl + S</i></button>
             <button id="loadFile"  class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
             <button id="CopyAll" onclick="CopyAll()" >Copy <i>Ctrl + shift + C</i></button>
@@ -265,6 +285,7 @@
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             document.getElementById('fileContent').classList.toggle('dark-mode');
+            document.getElementById('selectOldFile').classList.toggle('dark-mode');
         }
         function saveDarkMode() {
             var darkMode = document.body.classList.contains('dark-mode');
@@ -331,6 +352,7 @@
             const fileName = document.getElementById('fileName').value;
             load(fileName);
         });
+
         function load(txtname) {
             fetch('http://' + apiserver + `:${port}/api/readfile/` + txtname)
                 .then(response => response.text())
@@ -349,6 +371,7 @@
                 .catch(error => {
                     showToast('☠️ API dead', document.body.classList.contains('dark-mode'));// Toast match dark mode
                 });
+            loadOldFileList();
         }
 
         // Keyboard event listener 
@@ -411,13 +434,75 @@
                 }, 300);
             }, 1000);
         }
-        // 自动保存文件名框 到 localStorage
+        // onchange 自动保存文件名框 到 localStorage 并且加载它
         var fileNameInput = document.getElementById('fileName');
         fileNameInput.onchange = function () {
+            // 自动补全 txt 后缀
             var fileName = fileNameInput.value;
+            if (!fileName.includes('.txt')) {
+                fileName = fileName + '.txt';
+                document.getElementById('fileName').value = fileName;
+            }
             localStorage.setItem('fileName', fileName);
+            //将文件名添加到 local storage 历史文件名list ,
+            var oldFileList = localStorage.getItem('oldFileList');
+            if (oldFileList) {
+                oldFileList = oldFileList.split(',');
+                if (!oldFileList.includes(fileName)) {
+                    oldFileList.push(fileName);
+                    localStorage.setItem('oldFileList', oldFileList);
+                }
+            } else {
+                localStorage.setItem('oldFileList', fileName);
+            }
+            
             console.log('文件内容已存储到 localStorage: ' + fileName);
             load(fileName)
+        };
+
+        //加载历史文件名list , 从 local storyage
+        function loadOldFileList() {
+            //clearOldFileList
+            document.getElementById('selectOldFile').innerHTML = '';
+            var fileName = document.getElementById('selectOldFile').value;
+            var storedOldFileList = localStorage.getItem('oldFileList');
+
+            var first_option = document.createElement('option');
+                    first_option.value = 'History';
+                    first_option.text = '📋 History';
+                    document.getElementById('selectOldFile').appendChild(first_option);
+            var second_option = document.createElement('option');
+                    second_option.value = 'ClearAll';
+                    second_option.text = '🗑 ClearAll';
+                    document.getElementById('selectOldFile').appendChild(second_option);
+            
+
+            console.log('从 localStorage 加载历史文件名: ' + storedOldFileList);
+            if (storedOldFileList) {
+                var oldFileList = storedOldFileList.split(',');
+                for (var i = 0; i < oldFileList.length; i++) {
+                    var option = document.createElement('option');
+                    option.value = oldFileList[i];
+                    option.text = oldFileList[i];
+                    document.getElementById('selectOldFile').appendChild(option);
+                }
+            }
+            //select the current file
+            // let fileName = document.getElementById('fileName').value;
+            // document.getElementById('selectOldFile').value = fileName;
+        }
+        //选择历史文件名时，加载文件内容
+        let selectOldFile = document.getElementById('selectOldFile');
+        selectOldFile.onchange =  function () {
+            if (this.value == 'ClearAll') {
+                localStorage.clear();
+                console.log('localStorage 已清空');
+                showToast('🗑️ ClearAll', document.body.classList.contains('dark-mode'));
+                document.location.reload();
+                return;
+            }
+            document.getElementById('fileName').value = this.value;
+            load(this.value);
         };
         // 页面加载时 
         window.onload = function () {
@@ -440,6 +525,8 @@
                 fileNameInput.value = storedFileContent;
                 console.log('从 localStorage 加载文件名: ' + storedFileContent);
             }
+            
+
             load(fileName.value)
             //加载暗黑模式
             var storedDarkMode = localStorage.getItem('darkMode');
