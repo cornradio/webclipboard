@@ -9,7 +9,13 @@
 	<img src="images/image2.jpg" alt="Editor" width="500">
 </div>
 
+## 历史记录功能
+- 本项目使用 `localStorage` 保存本地访问过的文件名历史记录，不会保存在服务器上
+![查看历史记录](https://img2.imgtp.com/2024/03/26/oe6DXGzI.gif)
+
 ## docker 用法
+
+注意 docer 并没有一直跟随本项目的更新，是比较老的版本
 
 arm-64
 ```shell

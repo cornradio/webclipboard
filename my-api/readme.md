@@ -1,4 +1,9 @@
-# first run
+# quick test
+```
+node my-api/api.js
+```
+
+# first run (ubuntu)
 
 install node
 ```bash
@@ -26,7 +31,7 @@ cd /var/www/html/webclipboard/my-api
 node api.js
 ```
 
-# api
+# API
 Get
 ```
 http://127.0.0.1:3000/api/readfile/{any.txt}
@@ -37,7 +42,7 @@ Post
 ```
 http://127.0.0.1:3000/api/writefile/{any.txt}
 ```
-Post body
+Post body (json)
 ```
 {
   "content": "这是要写入文件的内容。"
