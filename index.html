@@ -236,10 +236,7 @@
         
         <div class="buttons-box">
             <input type="text" id="fileName" placeholder="xxx.txt" value="1.txt">
-            
-            <select id="selectOldFile">
-            </select>
-
+            <select id="selectOldFile"></select>
             <button id="saveFile">Save <i>Ctrl + S</i></button>
             <button id="loadFile"  class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
             <button id="CopyAll" onclick="CopyAll()" >Copy <i>Ctrl + shift + C</i></button>
@@ -477,7 +474,7 @@
                     document.getElementById('selectOldFile').appendChild(second_option);
             
 
-            console.log('从 localStorage 加载历史文件名: ' + storedOldFileList);
+            // console.log('从 localStorage 加载历史文件名: ' + storedOldFileList);
             if (storedOldFileList) {
                 var oldFileList = storedOldFileList.split(',');
                 for (var i = 0; i < oldFileList.length; i++) {
@@ -502,6 +499,7 @@
                 return;
             }
             document.getElementById('fileName').value = this.value;
+            localStorage.setItem('fileName', this.value);
             load(this.value);
         };
         // 页面加载时 
