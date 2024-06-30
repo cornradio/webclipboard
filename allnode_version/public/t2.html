@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,179 +8,115 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
+    .panel {
+        width: 100%;
+        height: 75vh;
+        background-color: #f1f1f1;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        display: flex;
+        overflow-y: scroll;
+    }
 
+    /* image container */
+    .image-container {
+        margin: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        height: fit-content;
+        max-width: fit-content;
+    }
 
-.panel {
-    width: 100%;
-    height: 75vh;
-    background-color: #f1f1f1;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-    display: flex;
-    overflow-y: scroll;
-}
+    /* image  */
+    .image-wrapper {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-right: 0px;
+    }
 
-/* image container */
-.image-container {
-    margin: 25px;
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 10px;
-    height: fit-content;
-}
+    .image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        box-shadow: 0 0 3px black;
+        border-radius: 5px;
+    }
 
-/* image  */
-.image-wrapper {
-    position: relative;
-    width: 150px;
-    height: 150px;
-}
+    /* small btn for images */
+    .open-btn,
+    .delete-btn {
+        position: absolute;
+        border: none;
+        color: rgb(255, 255, 255);
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: none;
+    }
 
-.image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    box-shadow: 0 0 3px black;
-    border-radius: 5px;
-}
+    .open-btn:active,
+    .delete-btn:active {
+        transform: scale(0.9);
+    }
 
-/* small btn for images */
-.open-btn , .delete-btn{
-    position: absolute;
-    border: none;
-    color: rgb(255, 255, 255);
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: none;
-}
-.open-btn:active , .delete-btn:active{
-    transform: scale(0.9);
-}
-.delete-btn {
-    top: -8px;
-    right: -10px;
-    background-color: rgba(255, 0, 0, 0.7);
-}
-.open-btn {
-    top: -8px;
-    right: 16px;
-    background-color: #586c64b3;
-}
+    .delete-btn {
+        top: -8px;
+        right: -10px;
+        background-color: rgba(255, 0, 0, 0.7);
+    }
 
-.image-wrapper:hover .delete-btn,.image-wrapper:hover .open-btn {
-    display: block;
-}
-/* new image upload */
-.upload-container {
-    width: 150px;
-    height: 150px;
-    border: 2px dashed #ccc;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-}
+    .open-btn {
+        top: -8px;
+        right: 16px;
+        background-color: #586c64b3;
+    }
 
-.plus-icon {
-    font-size: 48px;
-    color: #999;
-}
+    .image-wrapper:hover .delete-btn,
+    .image-wrapper:hover .open-btn {
+        display: block;
+    }
 
-.file-upload {
-    display: none;
-}
+    /* new image upload */
+    .upload-container {
+        width: 150px;
+        height: 150px;
+        border: 2px dashed #ccc;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+    }
 
+    .plus-icon {
+        font-size: 48px;
+        color: #999;
+    }
 
+    .file-upload {
+        display: none;
+    }
 </style>
+
 <body>
     <div class="panel">
         <div class="image-container">
 
+            <div class="image-wrapper" id="a.png">
+                <img src="images/1/a.png" class="image">
+                <button class="open-btn" onclick="showImage('a.png')">&plus;</button>
+                <button class="delete-btn" onclick="deleteImageByUrl('a.png')">&times;</button>
+            </div>
             <div class="image-wrapper">
-                <img src="images/1/a.png" alt="Image 3" class="image">
+                <img src="images/1/b.png" class="image">
                 <button class="open-btn">&plus;</button>
                 <button class="delete-btn">&times;</button>
             </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" alt="Image 3" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
+
 
 
             <div class="upload-container">
@@ -191,8 +128,23 @@
         </div>
     </div>
 </body>
+
 </html>
 
 <script>
+    0.0587
 
+.toExponential0    function deleteImageByUrl(url) {
+        var x = confirm("Delete this image?");
+        if (x ) {
+            var imageWrapper = document.getElementById(url);
+            if (imageWrapper) {
+                imageWrapper.remove();
+            }
+        }
+    }
+
+    function showImage(url) {
+        location.href = "images/1/" + 'a.png'
+    }
 </script>
