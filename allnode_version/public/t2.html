@@ -36,10 +36,10 @@
 
     .panel {
         position: fixed;
-        bottom: -88%;
+        bottom: -80%;
         left: 0;
         width: 100%;
-        height: 88%;
+        height: 80%;
         background-color: #1111117d;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -184,34 +184,34 @@
         opacity: 1;
     }
 
-    /* .upload-container {
+    .upload-container {
         opacity: 0;
         transition: opacity 0.2s ease-in;
     }
 
     .upload-container.loaded {
         opacity: 1;
-    } */
+    }
 </style>
 
 <body>
     <input class="btn" type="text" id="boxname" placeholder="image box-name">
+    <button id="opencloseBtn" class="btn" onclick="javascript:location.href = 'index.html'" style="color: rgb(255, 255, 255); float: left;"><b>back</b></button>
     <br>
     <br>
-    <button id="opencloseBtn" class="btn" onclick="clearbox()" style="color: rgb(248, 140, 140);">
-        <b>deleteAll</b></button>
+    <button id="opencloseBtn" class="btn" onclick="clearbox()" style="color: rgb(248, 140, 140);"><b>deleteAll</b></button>
     <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>refreash</b></button>
     <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
     <div id="panel" class="panel">
 
         <div id="image-container" class="image-container">
             <!-- add here -->
-            <div class="upload-container">
-                <label for="file-upload" class="upload-label" onclick="uploadImages()">
+            <div class="upload-container" ondragover="event.preventDefault()" ondragenter="event.preventDefault()"
+                ondrop="handleDrop(event)">
+                <label for="file-upload" class="upload-label">
                     <span class="plus-icon">+</span>
                 </label>
-                <input type="file" id="file-upload" class="file-upload" multiple>
-            </div>
+                <input type="file" id="file-upload" onchange="uploadImages()" class="file-upload" multiple>
             </div>
         </div>
     </div>
@@ -231,7 +231,7 @@
         if (!isPanelOpened) {
             document.getElementById('panel').style.bottom = '0';
         } else {
-            document.getElementById('panel').style.bottom = '-88%';
+            document.getElementById('panel').style.bottom = '-80%';
         }
         isPanelOpened = !isPanelOpened
     }
@@ -253,9 +253,9 @@
 </script>
 
 <script> // 上传 下载 reload 删除相关操作 
-    function getboxname(){
+    function getboxname() {
         var boxnameElement = document.getElementById('boxname');
-        if (boxnameElement.value==="") {
+        if (boxnameElement.value === "") {
             console.log('Boxname element not found,using 1 as default');
             return '1';
         } else {
@@ -272,40 +272,41 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
-                if ( data.length === 0) {
-                    console.log('No images found');
-                    return;
-                }
-                var imageContainer = document.getElementById('image-container');
-
                 // Clear the existing images
+                var imageContainer = document.getElementById('image-container');
                 imageContainer.innerHTML = '';
 
-                // Loop through the data and create image elements
-                data.forEach(function (image) {
-                    var imageWrapper = document.createElement('div');
-                    imageWrapper.className = 'image-wrapper';
-                    imageWrapper.id = image;
+                if (data.length === 0) {
+                    console.log('No images found');
+                }
+                else {
+                    // Loop through the data and create image elements
+                    data.forEach(function (image) {
+                        var imageWrapper = document.createElement('div');
+                        imageWrapper.className = 'image-wrapper';
+                        imageWrapper.id = image;
 
-                    var img = document.createElement('img');
-                    img.src = 'images/' + boxname + '/' + image;
-                    img.className = 'image';
+                        var img = document.createElement('img');
+                        img.src = 'images/' + boxname + '/' + image;
+                        img.className = 'image';
 
-                    var deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.onclick = function () { deleteImageByUrl(image); };
-                    deleteBtn.innerHTML = '&times;';
+                        var deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.onclick = function () { deleteImageByUrl(image); };
+                        deleteBtn.innerHTML = '&times;';
 
-                    imageWrapper.appendChild(img);
-                    imageWrapper.appendChild(deleteBtn);
+                        imageWrapper.appendChild(img);
+                        imageWrapper.appendChild(deleteBtn);
 
-                    imageContainer.appendChild(imageWrapper);
+                        imageContainer.appendChild(imageWrapper);
 
-                    // Add a delay to ensure the element is fully added to the DOM before starting the animation
-                    setTimeout(function () {
-                        imageWrapper.classList.add('loaded');
-                    }, 10);
-                });
+                        // Add a delay to ensure the element is fully added to the DOM before starting the animation
+                        setTimeout(function () {
+                            imageWrapper.classList.add('loaded');
+                        }, 10);
+                    });
+
+                }
 
                 // Add upload container at the end
                 var uploadContainer = document.createElement('div');
@@ -342,8 +343,15 @@
     }
 
     function uploadImages() {
+        const fileInput = document.getElementById('file-upload');
+        if (!fileInput || !fileInput.files) {
+            console.error('File input or files not found.');
+            return;
+        }
+
+        const files = Array.from(fileInput.files);
         const formData = new FormData();
-        this.files.forEach(file => {
+        files.forEach(file => {
             formData.append('image', file);
         });
 
@@ -359,12 +367,13 @@
             })
             .then(data => {
                 console.log(data);
-                refreshImageList(); // Refresh the image list after uploading
+                refreshImageList(); // 假设有一个函数来刷新上传后的图片列表
             })
             .catch(error => {
                 console.error('请求出错:', error);
             });
     }
+
 
     function handleDrop(event) {
         event.preventDefault();
@@ -458,7 +467,7 @@
     // auto do
     loadEmojiIcon('🏞️')
     refreshImageList()
-    //wait 2s
+    //wait .5s
     setTimeout(function () {
         openClosePanel()
     }, 500);
