@@ -62,8 +62,13 @@ app.get('/api/getImageList/:boxname', (req, res) => {
     const fileName = req.params.boxname;
     // 检查boxname是否合法
     let result = filter.checkimageboxname(fileName);
+    
     if (result === 'ok') {
-        const folderPath = path.join(__dirname, 'public', 'images', fileName);
+        const folderPath = path.join('public', 'images', fileName);
+
+        // Ensure the parent directories exist
+        fs.mkdirSync(path.join('public', 'images'), { recursive: true });
+
         if (fs.existsSync(folderPath)) {
             fs.readdir(folderPath, (err, files) => {
                 if (err) {

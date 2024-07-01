@@ -18,6 +18,7 @@
 x64
 ```shell
 docker run -dp 80:3000 kasusa/webclipboard-v1.0
+docker run -dp 80:3000 kasusa/webclipboard-v2.0
 ```
 
 浏览器访问 `http://<服务器ip>` 即可使用剪切版  

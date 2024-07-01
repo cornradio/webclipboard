@@ -184,14 +184,14 @@
         opacity: 1;
     }
 
-    .upload-container {
+    /* .upload-container {
         opacity: 0;
         transition: opacity 0.2s ease-in;
     }
 
     .upload-container.loaded {
         opacity: 1;
-    }
+    } */
 </style>
 
 <body>
@@ -206,16 +206,12 @@
 
         <div id="image-container" class="image-container">
             <!-- add here -->
-            <div class="image-wrapper" id="a.png">
-                <img src="images/1/a.png" class="image">
-                <button class="delete-btn" onclick="deleteImageByUrl('a.png')">&times;</button>
-            </div>
-            <div class="upload-container" ondragover="event.preventDefault()" ondragenter="event.preventDefault()"
-                ondrop="handleDrop(event)">
+            <div class="upload-container">
                 <label for="file-upload" class="upload-label" onclick="uploadImages()">
                     <span class="plus-icon">+</span>
                 </label>
                 <input type="file" id="file-upload" class="file-upload" multiple>
+            </div>
             </div>
         </div>
     </div>
@@ -276,6 +272,10 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
+                if ( data.length === 0) {
+                    console.log('No images found');
+                    return;
+                }
                 var imageContainer = document.getElementById('image-container');
 
                 // Clear the existing images
@@ -342,9 +342,8 @@
     }
 
     function uploadImages() {
-        const files = Array.from(this.files).slice(0, 10); // Limit to 10 files
         const formData = new FormData();
-        files.forEach(file => {
+        this.files.forEach(file => {
             formData.append('image', file);
         });
 
