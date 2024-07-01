@@ -107,8 +107,64 @@ app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
     }
 });
 
+
+// 删除图片
+app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
+    const folderPath = path.join(__dirname, 'public', 'images', req.params.boxname);
+    const filePath = path.join(folderPath, req.params.filename);
+
+    // 检查文件是否存在
+    if (fs.existsSync(filePath)) {
+        // 删除文件
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                res.status(500).send('Error deleting the image');
+            } else {
+                res.send('Image deleted successfully');
+            }
+        });
+    } else {
+        res.status(404).send('Image not found');
+    }
+});
+
+// 删除imagebox
+app.post('/api/clearBox/:boxname', (req, res) => {
+    const folderPath = path.join(__dirname, 'public', 'images', req.params.boxname);
+
+    // 检查文件夹是否存在
+    if (fs.existsSync(folderPath)) {
+        // 读取文件夹内容
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                return res.status(500).send('Error reading the folder');
+            }
+
+            // 删除每个文件
+            files.forEach(file => {
+                const filePath = path.join(folderPath, file);
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error(`Error deleting file ${filePath}`);
+                    }
+                });
+            });
+
+            // 删除文件夹
+            fs.rmdir(folderPath, { recursive: true }, (err) => {
+                if (err) {
+                    return res.status(500).send('Error deleting the folder');
+                }
+                res.send('Folder cleared successfully');
+            });
+        });
+    } else {
+        res.status(404).send('Folder not found');
+    }
+});
+
+
 // 启动服务器
 app.listen(port,() => {
   console.log(`Server is running on port ${port}`);
 });
-

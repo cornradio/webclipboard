@@ -8,17 +8,30 @@
     <title>Image Panel</title>
 </head>
 <style>
-body {
-    color: white;
-    background-color: black;
-    background-image: url('bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 0;
-    height: 100vh; /* Ensure the body takes up the full height of the viewport */
-    overflow: hidden; /* Optional: Prevent scrolling if the background image doesn't cover the content */
-}
+    body {
+        color: white;
+        background-color: black;
+        background-image: url('bg.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin: 0;
+        height: 100vh;
+        /* Ensure the body takes up the full height of the viewport */
+        overflow: hidden;
+        /* Optional: Prevent scrolling if the background image doesn't cover the content */
+    }
+
+    /* Media query for screens smaller than 480px */
+    @media (max-width: 600px) {
+
+        .image-wrapper,
+        .upload-container {
+            max-width: 100px;
+            max-height: 100px;
+            margin: 15px;
+        }
+    }
 
 
     .panel {
@@ -65,26 +78,36 @@ body {
     }
 
     /* small btn for images */
- /* small btn for images */
-.delete-btn {
-    position: absolute;
-    border: none;
-    color: rgb(255, 255, 255);
-    background-color: rgba(0, 0, 0, 0.5); /* Add a background color for better visibility */
-    cursor: pointer;
-    border-radius: 50%; /* Ensure the button is circular */
-    width: 20px;
-    height: 20px;
-    display: none;
-    align-items: center; /* Center text vertically */
-    justify-content: center; /* Center text horizontally */
-    display: none; /* Use flexbox */
-    line-height: 20px; /* Ensure text is vertically centered */
-    text-align: center; /* Center text horizontally */
-    font-size: 14px; /* Adjust font size if needed */
-    padding: 0; /* Remove default padding */
-    box-sizing: border-box; /* Ensure padding and border are included in the width and height */
-}
+    /* small btn for images */
+    .delete-btn {
+        position: absolute;
+        border: none;
+        color: rgb(255, 255, 255);
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Add a background color for better visibility */
+        cursor: pointer;
+        border-radius: 50%;
+        /* Ensure the button is circular */
+        width: 20px;
+        height: 20px;
+        display: none;
+        align-items: center;
+        /* Center text vertically */
+        justify-content: center;
+        /* Center text horizontally */
+        display: none;
+        /* Use flexbox */
+        line-height: 20px;
+        /* Ensure text is vertically centered */
+        text-align: center;
+        /* Center text horizontally */
+        font-size: 14px;
+        /* Adjust font size if needed */
+        padding: 0;
+        /* Remove default padding */
+        box-sizing: border-box;
+        /* Ensure padding and border are included in the width and height */
+    }
 
 
     .open-btn:active,
@@ -133,22 +156,25 @@ body {
         float: right;
         padding: 6px;
         margin-left: 2px;
-        background-color: #f1f1f17f;
+        background-color: #0000007f;
         border: 1px solid;
         border-radius: 5px;
+        color: aqua;
+
         line-height: 7px;
     }
 
     input {
         padding: 0;
-        color: aqua;
+        border: 0px;
+        background-color: black;
     }
 
     input::-webkit-input-placeholder {
         color: #ffffff86;
-        /* 例如设置为灰色 */
     }
-    /* refresh animation */ 
+
+    /* refresh animation */
     .image-wrapper {
         opacity: 0;
         transition: opacity 0.5s ease-in;
@@ -172,6 +198,8 @@ body {
     <input class="btn" type="text" id="boxname" placeholder="image box-name">
     <br>
     <br>
+    <button id="opencloseBtn" class="btn" onclick="clearbox()" style="color: rgb(248, 140, 140);">
+        <b>deleteAll</b></button>
     <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>refreash</b></button>
     <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
     <div id="panel" class="panel">
@@ -229,131 +257,142 @@ body {
 </script>
 
 <script> // 上传 下载 reload 删除相关操作 
-function refreshImageList() {
-    var boxname = '1';
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/getImageList/' + boxname);
+    function getboxname(){
+        var boxnameElement = document.getElementById('boxname');
+        if (boxnameElement.value==="") {
+            console.log('Boxname element not found,using 1 as default');
+            return '1';
+        } else {
+            console.log('Boxname:', boxnameElement.value);
+            return boxnameElement.value;
+        }
+    }
+    function refreshImageList() {
+        var boxname = getboxname();
 
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            var imageContainer = document.getElementById('image-container');
-            
-            // Clear the existing images
-            imageContainer.innerHTML = '';
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/getImageList/' + boxname);
 
-            // Loop through the data and create image elements
-            data.forEach(function(image) {
-                var imageWrapper = document.createElement('div');
-                imageWrapper.className = 'image-wrapper';
-                imageWrapper.id = image;
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                var imageContainer = document.getElementById('image-container');
 
-                var img = document.createElement('img');
-                img.src = 'images/' + boxname + '/' + image;
-                img.className = 'image';
+                // Clear the existing images
+                imageContainer.innerHTML = '';
 
-                var deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.onclick = function() { deleteImageByUrl(image); };
-                deleteBtn.innerHTML = '&times;';
+                // Loop through the data and create image elements
+                data.forEach(function (image) {
+                    var imageWrapper = document.createElement('div');
+                    imageWrapper.className = 'image-wrapper';
+                    imageWrapper.id = image;
 
-                imageWrapper.appendChild(img);
-                imageWrapper.appendChild(deleteBtn);
+                    var img = document.createElement('img');
+                    img.src = 'images/' + boxname + '/' + image;
+                    img.className = 'image';
 
-                imageContainer.appendChild(imageWrapper);
+                    var deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.onclick = function () { deleteImageByUrl(image); };
+                    deleteBtn.innerHTML = '&times;';
+
+                    imageWrapper.appendChild(img);
+                    imageWrapper.appendChild(deleteBtn);
+
+                    imageContainer.appendChild(imageWrapper);
+
+                    // Add a delay to ensure the element is fully added to the DOM before starting the animation
+                    setTimeout(function () {
+                        imageWrapper.classList.add('loaded');
+                    }, 10);
+                });
+
+                // Add upload container at the end
+                var uploadContainer = document.createElement('div');
+                uploadContainer.className = 'upload-container';
+                uploadContainer.setAttribute('ondragover', 'event.preventDefault()');
+                uploadContainer.setAttribute('ondragenter', 'event.preventDefault()');
+                uploadContainer.setAttribute('ondrop', 'handleDrop(event)');
+
+                var uploadLabel = document.createElement('label');
+                uploadLabel.className = 'upload-label';
+                uploadLabel.setAttribute('for', 'file-upload');
+                uploadLabel.innerHTML = '<span class="plus-icon">+</span>';
+
+                var fileUpload = document.createElement('input');
+                fileUpload.type = 'file';
+                fileUpload.id = 'file-upload';
+                fileUpload.className = 'file-upload';
+                fileUpload.setAttribute('multiple', '');
+                fileUpload.onchange = uploadImages;
+
+                uploadContainer.appendChild(uploadLabel);
+                uploadContainer.appendChild(fileUpload);
+                imageContainer.appendChild(uploadContainer);
 
                 // Add a delay to ensure the element is fully added to the DOM before starting the animation
-                setTimeout(function() {
-                    imageWrapper.classList.add('loaded');
+                setTimeout(function () {
+                    uploadContainer.classList.add('loaded');
                 }, 10);
+            } else if (xhr.readyState === 4) {
+                console.error('请求失败，状态码:', xhr.status);
+            }
+        };
+        xhr.send();
+    }
+
+    function uploadImages() {
+        const files = Array.from(this.files).slice(0, 10); // Limit to 10 files
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('image', file);
+        });
+
+        fetch('/api/uploadImage/1', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP 错误！状态: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                refreshImageList(); // Refresh the image list after uploading
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
             });
+    }
 
-            // Add upload container at the end
-            var uploadContainer = document.createElement('div');
-            uploadContainer.className = 'upload-container';
-            uploadContainer.setAttribute('ondragover', 'event.preventDefault()');
-            uploadContainer.setAttribute('ondragenter', 'event.preventDefault()');
-            uploadContainer.setAttribute('ondrop', 'handleDrop(event)');
-
-            var uploadLabel = document.createElement('label');
-            uploadLabel.className = 'upload-label';
-            uploadLabel.setAttribute('for', 'file-upload');
-            uploadLabel.innerHTML = '<span class="plus-icon">+</span>';
-
-            var fileUpload = document.createElement('input');
-            fileUpload.type = 'file';
-            fileUpload.id = 'file-upload';
-            fileUpload.className = 'file-upload';
-            fileUpload.setAttribute('multiple', '');
-            fileUpload.onchange = uploadImages;
-
-            uploadContainer.appendChild(uploadLabel);
-            uploadContainer.appendChild(fileUpload);
-            imageContainer.appendChild(uploadContainer);
-
-            // Add a delay to ensure the element is fully added to the DOM before starting the animation
-            setTimeout(function() {
-                uploadContainer.classList.add('loaded');
-            }, 10);
-        } else if (xhr.readyState === 4) {
-            console.error('请求失败，状态码:', xhr.status);
-        }
-    };
-    xhr.send();
-}
-
-function uploadImages() {
-    const files = Array.from(this.files).slice(0, 10); // Limit to 10 files
-    const formData = new FormData();
-    files.forEach(file => {
-        formData.append('image', file);
-    });
-
-    fetch('/api/uploadImage/1', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP 错误！状态: ${response.status}`);
-            }
-            return response.text();
-        })
-        .then(data => {
-            console.log(data);
-            refreshImageList(); // Refresh the image list after uploading
-        })
-        .catch(error => {
-            console.error('请求出错:', error);
+    function handleDrop(event) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files).slice(0, 10); // Limit to 10 files
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('image', file);
         });
-}
 
-function handleDrop(event) {
-    event.preventDefault();
-    const files = Array.from(event.dataTransfer.files).slice(0, 10); // Limit to 10 files
-    const formData = new FormData();
-    files.forEach(file => {
-        formData.append('image', file);
-    });
-
-    fetch('/api/uploadImage/1', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP 错误！状态: ${response.status}`);
-            }
-            return response.text();
+        fetch('/api/uploadImage/1', {
+            method: 'POST',
+            body: formData
         })
-        .then(data => {
-            console.log(data);
-            refreshImageList(); // Refresh the image list after uploading
-        })
-        .catch(error => {
-            console.error('请求出错:', error);
-        });
-}
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP 错误！状态: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                refreshImageList(); // Refresh the image list after uploading
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
+            });
+    }
 
     function deleteImageByUrl(url) {
         var x = confirm("Delete this image?");
@@ -362,6 +401,54 @@ function handleDrop(event) {
             if (imageWrapper) {
                 imageWrapper.remove();
             }
+
+            // 获取 boxname 和 filename
+            var boxname = getboxname();
+            var filename = url
+
+            // 创建 XMLHttpRequest 对象
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/deleteImage/' + boxname + '/' + filename, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        console.log('Image deleted successfully');
+                    } else {
+                        console.error('Error deleting image');
+                    }
+                }
+            };
+
+            // 发送请求
+            xhr.send();
+        }
+    }
+    function clearbox() {
+        var x = confirm("Clear this box?"); // 显示确认框
+
+        if (x) {
+            // 发送请求到后端
+            var xhr = new XMLHttpRequest();
+            var boxname = getboxname();
+            xhr.open('POST', '/api/clearBox/' + boxname, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        console.log('Box cleared successfully');
+                        //reload this page
+                        location.reload();
+                    } else {
+                        console.error('Error clearing the box');
+                        // 处理错误情况，例如显示错误消息给用户
+                    }
+                }
+            };
+
+            xhr.send();
         }
     }
 
