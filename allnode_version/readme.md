@@ -49,3 +49,10 @@ Post body (json)
   "content": "这是要写入文件的内容。"
 }
 ```
+
+## docker build 
+```
+docker build -t kasusa/webclipboard-v2.0 .
+docker run -d -p 8000:3000  kasusa/webclipboard-v2.0
+docker push kasusa/webclipboard-v2.0
+```

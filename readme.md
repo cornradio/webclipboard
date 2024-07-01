@@ -20,6 +20,7 @@ x64
 docker run -dp 80:3000 kasusa/webclipboard-v1.0
 docker run -dp 80:3000 kasusa/webclipboard-v2.0
 ```
+kasusa/webclipboard-v2.0 增加了图片存储功能
 
 浏览器访问 `http://<服务器ip>` 即可使用剪切版  
 如果需要自行编译其他架构： 请进入 `allnode_version\` 文件夹 ，装好node后执行 `docker build .`
