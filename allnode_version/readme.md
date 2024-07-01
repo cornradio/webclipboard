@@ -16,6 +16,7 @@ sudo -i
 
 npm install express
 npm install cors
+npm install multer
 ```
 
 run

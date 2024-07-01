@@ -1,6 +1,8 @@
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const app = express();
 app.use(cors()); // 允许跨域请求
 const port = 3000;
@@ -53,8 +55,60 @@ app.post('/api/writefile/:fileName', (req, res) => {
         res.status(400).send(result);
     }
 });
-  
+
+// 获取图片列表 
+// response like ["a.png","b.png"]
+app.get('/api/getImageList/:boxname', (req, res) => {
+    const fileName = req.params.boxname;
+    // 检查boxname是否合法
+    let result = filter.checkimageboxname(fileName);
+    if (result === 'ok') {
+        const folderPath = path.join(__dirname, 'public', 'images', fileName);
+        if (fs.existsSync(folderPath)) {
+            fs.readdir(folderPath, (err, files) => {
+                if (err) {
+                    res.status(500).send('Internal Server Error');
+                } else {
+                    res.send(files);
+                }
+            });
+        } else {
+            fs.mkdirSync(folderPath);
+            res.send([]);
+        }
+    } else {
+        res.status(400).send(result);
+    }
+});
+
+//上传图片
+// 设置存储上传文件的配置
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const folderPath = path.join(__dirname, 'public', 'images', req.params.boxname);
+        // 如果文件夹不存在，创建它
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdirSync(folderPath, { recursive: true });
+        }
+        cb(null, folderPath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => { 
+    if (req.files && req.files.length > 0) {
+        res.status(200).send('图片上传成功');
+    } else {
+        res.status(400).send('未成功上传图片');
+    }
+});
+
 // 启动服务器
 app.listen(port,() => {
   console.log(`Server is running on port ${port}`);
 });
+

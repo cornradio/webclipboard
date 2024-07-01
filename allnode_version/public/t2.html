@@ -3,32 +3,48 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Panel</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <style>
+body {
+    color: white;
+    background-color: black;
+    background-image: url('bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    height: 100vh; /* Ensure the body takes up the full height of the viewport */
+    overflow: hidden; /* Optional: Prevent scrolling if the background image doesn't cover the content */
+}
+
+
     .panel {
         position: fixed;
         bottom: -80%;
         left: 0;
         width: 100%;
         height: 80%;
-        background-color: #f1f1f1;
+        background-color: #1111117d;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-        transition: bottom 0.5s ease-in-out;
-        border-top: 1px solid;
-
+        transition: bottom 0.3s cubic-bezier(0.42, 0, 0, 1.74);
+        /* jumping effect */
+        border-top: 1px solid black;
+        overflow-y: auto;
     }
-
 
     /* image container */
     .image-container {
         margin: 10px;
+        padding: 10px;
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        height: fit-content;
+        /* height: fit-content; */
         max-width: fit-content;
     }
 
@@ -44,23 +60,32 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        box-shadow: 0 0 3px black;
+        /* box-shadow: 0 0 3px black; */
         border-radius: 5px;
     }
 
     /* small btn for images */
-    .open-btn,
-    .delete-btn {
-        position: absolute;
-        border: none;
-        color: rgb(255, 255, 255);
-        font-size: 18px;
-        cursor: pointer;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: none;
-    }
+ /* small btn for images */
+.delete-btn {
+    position: absolute;
+    border: none;
+    color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0.5); /* Add a background color for better visibility */
+    cursor: pointer;
+    border-radius: 50%; /* Ensure the button is circular */
+    width: 20px;
+    height: 20px;
+    display: none;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    display: none; /* Use flexbox */
+    line-height: 20px; /* Ensure text is vertically centered */
+    text-align: center; /* Center text horizontally */
+    font-size: 14px; /* Adjust font size if needed */
+    padding: 0; /* Remove default padding */
+    box-sizing: border-box; /* Ensure padding and border are included in the width and height */
+}
+
 
     .open-btn:active,
     .delete-btn:active {
@@ -73,22 +98,16 @@
         background-color: rgba(255, 0, 0, 0.7);
     }
 
-    .open-btn {
-        top: -8px;
-        right: 16px;
-        background-color: #586c64b3;
-    }
 
-    .image-wrapper:hover .delete-btn,
-    .image-wrapper:hover .open-btn {
-        display: block;
+    .image-wrapper:hover .delete-btn {
+        display: flex;
     }
 
     /* new image upload */
     .upload-container {
         width: 150px;
         height: 150px;
-        border: 2px dashed #ccc;
+        border: 2px dashed #cccccca9;
         border-radius: 5px;
         display: flex;
         align-items: center;
@@ -98,6 +117,8 @@
     }
 
     .plus-icon {
+        padding: 60px;
+        cursor: pointer;
         font-size: 48px;
         color: #999;
     }
@@ -106,46 +127,67 @@
         display: none;
     }
 
-    .close-btn {
+    .btn {
         font-size: 14px;
         cursor: pointer;
-        left: 4px;
+        float: right;
         padding: 6px;
-        position: absolute;
-        top: -18px;
-        background-color: #f1f1f1;
+        margin-left: 2px;
+        background-color: #f1f1f17f;
         border: 1px solid;
-        /* box-shadow: 0px 0px 7px #000000a3; */
-        border-radius: 5px 5px 0 0;
-        border-bottom: none;
-        /* width: 18px; */
-        height: 6px;
+        border-radius: 5px;
         line-height: 7px;
+    }
+
+    input {
+        padding: 0;
+        color: aqua;
+    }
+
+    input::-webkit-input-placeholder {
+        color: #ffffff86;
+        /* 例如设置为灰色 */
+    }
+    /* refresh animation */ 
+    .image-wrapper {
+        opacity: 0;
+        transition: opacity 0.5s ease-in;
+    }
+
+    .image-wrapper.loaded {
+        opacity: 1;
+    }
+
+    .upload-container {
+        opacity: 0;
+        transition: opacity 0.2s ease-in;
+    }
+
+    .upload-container.loaded {
+        opacity: 1;
     }
 </style>
 
 <body>
-    <button id="openBtn">Open Panel</button>
-
+    <input class="btn" type="text" id="boxname" placeholder="image box-name">
+    <br>
+    <br>
+    <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>refreash</b></button>
+    <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
     <div id="panel" class="panel">
-        <div class="image-container">
-            <span id="closeBtn" class="close-btn"><b>&times;</b></span>
+
+        <div id="image-container" class="image-container">
+            <!-- add here -->
             <div class="image-wrapper" id="a.png">
                 <img src="images/1/a.png" class="image">
-                <button class="open-btn" onclick="showImage('a.png')">&plus;</button>
                 <button class="delete-btn" onclick="deleteImageByUrl('a.png')">&times;</button>
             </div>
-            <div class="image-wrapper">
-                <img src="images/1/b.png" class="image">
-                <button class="open-btn">&plus;</button>
-                <button class="delete-btn">&times;</button>
-            </div>
-
-            <div class="upload-container">
-                <label for="file-upload" class="upload-label">
+            <div class="upload-container" ondragover="event.preventDefault()" ondragenter="event.preventDefault()"
+                ondrop="handleDrop(event)">
+                <label for="file-upload" class="upload-label" onclick="uploadImages()">
                     <span class="plus-icon">+</span>
                 </label>
-                <input type="file" id="file-upload" class="file-upload">
+                <input type="file" id="file-upload" class="file-upload" multiple>
             </div>
         </div>
     </div>
@@ -153,7 +195,166 @@
 
 </html>
 
-<script>
+<script>//基础
+
+
+    function showImage(url) {
+        location.href = url
+    }
+
+    var isPanelOpened = false
+    function openClosePanel() {
+        if (!isPanelOpened) {
+            document.getElementById('panel').style.bottom = '0';
+        } else {
+            document.getElementById('panel').style.bottom = '-80%';
+        }
+        isPanelOpened = !isPanelOpened
+    }
+    // dragdrop
+    function handleDrop(event) {
+        event.preventDefault();
+        var file = event.dataTransfer.files[0];
+        alert("File dropped: " + file.name);
+        // 在这里进行文件处理或上传的相关操作
+        console.log(file);
+    }
+
+    function loadEmojiIcon(curEmoji) {
+        //将网页图标改成emoji curEmoji
+        const favicon = document.querySelector('link[rel="icon"]');
+        // favicon.href = `https://www.emojiall.com/en/header-svg/${curEmoji}.svg`;
+        favicon.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${curEmoji}</text></svg>`;
+    }
+</script>
+
+<script> // 上传 下载 reload 删除相关操作 
+function refreshImageList() {
+    var boxname = '1';
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/getImageList/' + boxname);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            var imageContainer = document.getElementById('image-container');
+            
+            // Clear the existing images
+            imageContainer.innerHTML = '';
+
+            // Loop through the data and create image elements
+            data.forEach(function(image) {
+                var imageWrapper = document.createElement('div');
+                imageWrapper.className = 'image-wrapper';
+                imageWrapper.id = image;
+
+                var img = document.createElement('img');
+                img.src = 'images/' + boxname + '/' + image;
+                img.className = 'image';
+
+                var deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = function() { deleteImageByUrl(image); };
+                deleteBtn.innerHTML = '&times;';
+
+                imageWrapper.appendChild(img);
+                imageWrapper.appendChild(deleteBtn);
+
+                imageContainer.appendChild(imageWrapper);
+
+                // Add a delay to ensure the element is fully added to the DOM before starting the animation
+                setTimeout(function() {
+                    imageWrapper.classList.add('loaded');
+                }, 10);
+            });
+
+            // Add upload container at the end
+            var uploadContainer = document.createElement('div');
+            uploadContainer.className = 'upload-container';
+            uploadContainer.setAttribute('ondragover', 'event.preventDefault()');
+            uploadContainer.setAttribute('ondragenter', 'event.preventDefault()');
+            uploadContainer.setAttribute('ondrop', 'handleDrop(event)');
+
+            var uploadLabel = document.createElement('label');
+            uploadLabel.className = 'upload-label';
+            uploadLabel.setAttribute('for', 'file-upload');
+            uploadLabel.innerHTML = '<span class="plus-icon">+</span>';
+
+            var fileUpload = document.createElement('input');
+            fileUpload.type = 'file';
+            fileUpload.id = 'file-upload';
+            fileUpload.className = 'file-upload';
+            fileUpload.setAttribute('multiple', '');
+            fileUpload.onchange = uploadImages;
+
+            uploadContainer.appendChild(uploadLabel);
+            uploadContainer.appendChild(fileUpload);
+            imageContainer.appendChild(uploadContainer);
+
+            // Add a delay to ensure the element is fully added to the DOM before starting the animation
+            setTimeout(function() {
+                uploadContainer.classList.add('loaded');
+            }, 10);
+        } else if (xhr.readyState === 4) {
+            console.error('请求失败，状态码:', xhr.status);
+        }
+    };
+    xhr.send();
+}
+
+function uploadImages() {
+    const files = Array.from(this.files).slice(0, 10); // Limit to 10 files
+    const formData = new FormData();
+    files.forEach(file => {
+        formData.append('image', file);
+    });
+
+    fetch('/api/uploadImage/1', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP 错误！状态: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log(data);
+            refreshImageList(); // Refresh the image list after uploading
+        })
+        .catch(error => {
+            console.error('请求出错:', error);
+        });
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files).slice(0, 10); // Limit to 10 files
+    const formData = new FormData();
+    files.forEach(file => {
+        formData.append('image', file);
+    });
+
+    fetch('/api/uploadImage/1', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP 错误！状态: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log(data);
+            refreshImageList(); // Refresh the image list after uploading
+        })
+        .catch(error => {
+            console.error('请求出错:', error);
+        });
+}
+
     function deleteImageByUrl(url) {
         var x = confirm("Delete this image?");
         if (x) {
@@ -164,14 +365,16 @@
         }
     }
 
-    function showImage(url) {
-        location.href = "images/1/" + 'a.png'
-    }
-    document.getElementById('openBtn').addEventListener('click', function () {
-        document.getElementById('panel').style.bottom = '0';
-    });
 
-    document.getElementById('closeBtn').addEventListener('click', function () {
-        document.getElementById('panel').style.bottom = '-80%';
-    });
+
+
+
+    // auto do
+    loadEmojiIcon('🏞️')
+    refreshImageList()
+    //wait 2s
+    setTimeout(function () {
+        openClosePanel()
+    }, 500);
+
 </script>

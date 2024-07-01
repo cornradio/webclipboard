@@ -14,5 +14,8 @@ function check(fileName){
     // 无问题返回
     return 'ok';
 }
-
+function checkimageboxname(){
+    return 'ok';
+}
 exports.check = check;
+exports.checkimageboxname = checkimageboxname;
