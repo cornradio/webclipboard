@@ -367,14 +367,15 @@
             console.error('File input or files not found.');
             return;
         }
-
+        
         const files = Array.from(fileInput.files);
         const formData = new FormData();
         files.forEach(file => {
             formData.append('image', file);
         });
-
-        fetch('/api/uploadImage/1', {
+        
+        var boxname = getboxname();
+        fetch('/api/uploadImage/' + boxname, {
             method: 'POST',
             body: formData
         })
