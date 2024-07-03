@@ -5,9 +5,21 @@
     <meta charset="UTF-8">
     <link rel="icon" href="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 添加苹果快捷方式图标 -->
+    <!-- <link rel="apple-touch-icon" href="icon.png" /> -->
+    <link rel="apple-touch-icon" href="icon.icns" />
+    <!-- 开启全屏显示（以 App 模式运行） -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-startup-image" href="bg.jpg">
+    <!-- APP模式下，顶部空白处的颜色,可选为 default black black-translucent , default 使用 body 的背景色 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!--  App 名称，在用户选择添加到主页的时候这个名字会自动蹦出来 -->
+    <meta name="apple-mobile-web-app-title" content="Cliper">
+    
+    
     <title>Web Pasteboard</title>
     <style>
-        select{
+        select {
             position: fixed;
             top: 0;
             left: 0;
@@ -15,14 +27,17 @@
             transition: .3s;
 
         }
-        select:hover{
+
+        select:hover {
             opacity: 0.8;
         }
-        #selectOldFile.dark-mode{
+
+        #selectOldFile.dark-mode {
             color: #fff;
             background-color: #2d2d2d;
             border: none;
         }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f3f3f3;
@@ -51,7 +66,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             resize: none;
             transition: background-color 0.5s;
-            font-family: 'cascadia mono', '微软雅黑' ,monospace;
+            font-family: 'cascadia mono', '微软雅黑', monospace;
             transition: .2s;
 
         }
@@ -103,11 +118,13 @@
                 display: flex;
                 flex-direction: column;
             }
+
             .buttons-box {
                 width: 100%;
                 display: flex;
             }
-            .hidden_on_iphone{
+
+            .hidden_on_iphone {
                 display: none;
             }
 
@@ -124,10 +141,12 @@
             display: list-item;
             color: #666;
         }
+
         /* button hover float hover box */
-        button:hover i{
+        button:hover i {
             display: inline-block;
         }
+
         button i {
             display: none;
         }
@@ -233,13 +252,13 @@
         <div class="textarea-box">
             <textarea id="fileContent" placeholder="Paste your content here..."></textarea>
         </div>
-        
+
         <div class="buttons-box">
             <input type="text" id="fileName" placeholder="xxx.txt" value="1.txt">
             <select id="selectOldFile"></select>
             <button id="saveFile">Save <i>Ctrl + S</i></button>
-            <button id="loadFile"  class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
-            <button id="CopyAll" onclick="CopyAll()" >Copy <i>Ctrl + shift + C</i></button>
+            <button id="loadFile" class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
+            <button id="CopyAll" onclick="CopyAll()">Copy <i>Ctrl + shift + C</i></button>
             <button id="Share" class="" onclick="Share()">Share <i>Ctrl + shift + S</i></button>
             <button id="images" onclick="javascript:location.href = 't2.html'">images <i>Ctrl + I</i></button>
             <button id="toggleMode">Dark Mode <i>Ctrl + B</i></button>
@@ -280,17 +299,17 @@
             document.execCommand('copy');
             showToast('📋 Copied All', document.body.classList.contains('dark-mode'));
         }
-        function Share(){
+        function Share() {
             var shareurl = window.location.href.split('?txt=')[0] + '?txt=' + document.getElementById('fileName').value.split('.')[0];
             console.log('分享链接: ' + shareurl);
             // if http no s
-            if (window.location.href.split('/')[0] == 'http:'){
+            if (window.location.href.split('/')[0] == 'http:') {
                 showToast('🔗 F12 to copy :', document.body.classList.contains('dark-mode'));
                 // alert with copy button
                 prompt("Copy this and Share!", shareurl);
                 // prompt(shareurl + '\nyou can also see this link in console (F12)');
             }
-            else{
+            else {
                 navigator.clipboard.writeText(shareurl);
                 showToast('🔗 Copied', document.body.classList.contains('dark-mode'));
             }
@@ -435,7 +454,7 @@
             } else {
                 localStorage.setItem('oldFileList', fileName);
             }
-            
+
             console.log('文件内容已存储到 localStorage: ' + fileName);
             load(fileName)
         };
@@ -448,14 +467,14 @@
             var storedOldFileList = localStorage.getItem('oldFileList');
 
             var first_option = document.createElement('option');
-                    first_option.value = 'History';
-                    first_option.text = '📋 History';
-                    document.getElementById('selectOldFile').appendChild(first_option);
+            first_option.value = 'History';
+            first_option.text = '📋 History';
+            document.getElementById('selectOldFile').appendChild(first_option);
             var second_option = document.createElement('option');
-                    second_option.value = 'ClearAll';
-                    second_option.text = '🗑 ClearAll';
-                    document.getElementById('selectOldFile').appendChild(second_option);
-            
+            second_option.value = 'ClearAll';
+            second_option.text = '🗑 ClearAll';
+            document.getElementById('selectOldFile').appendChild(second_option);
+
 
             // console.log('从 localStorage 加载历史文件名: ' + storedOldFileList);
             if (storedOldFileList) {
@@ -473,7 +492,7 @@
         }
         //选择历史文件名时，加载文件内容
         let selectOldFile = document.getElementById('selectOldFile');
-        selectOldFile.onchange =  function () {
+        selectOldFile.onchange = function () {
             if (this.value == 'ClearAll') {
                 localStorage.clear();
                 console.log('localStorage 已清空');
@@ -490,7 +509,7 @@
             //如果存在urlparm txt参数，优先加载
             var queryString = window.location.search;
             var urlParams = new URLSearchParams(queryString);
-		    var txtParm = urlParams.get('txt');
+            var txtParm = urlParams.get('txt');
             var storedFileContent = '';
             if (txtParm) {
                 storedFileContent = txtParm + '.txt';
@@ -498,7 +517,7 @@
                 //设置title
                 document.title = storedFileContent;
             }
-            else{
+            else {
                 storedFileContent = localStorage.getItem('fileName');
             }
             //加载文件名框
@@ -506,7 +525,7 @@
                 fileNameInput.value = storedFileContent;
                 console.log('从 localStorage 加载文件名: ' + storedFileContent);
             }
-            
+
 
             load(fileName.value)
             //加载暗黑模式
