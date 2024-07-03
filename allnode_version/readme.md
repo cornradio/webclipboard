@@ -52,7 +52,7 @@ Post body (json)
 
 ## docker build 
 ```
-docker build -t kasusa/webclipboard-v2.0 .
+docker build -t kasusa/webclipboard-v2.0:20240703 .
 docker run -d -p 8000:3000  kasusa/webclipboard-v2.0
-docker push kasusa/webclipboard-v2.0
+docker push kasusa/webclipboard-v2.0:20240703
 ```
