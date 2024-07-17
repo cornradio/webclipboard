@@ -11,7 +11,7 @@
     body {
         color: white;
         background-color: black;
-        background-image: url('images/bg/bg.jpg'); 
+        background-image: url('images/bg/bg.jpg');
         /* background-image: url('bg.jpg'); */
         background-size: cover;
         background-position: center;
@@ -34,18 +34,23 @@
             max-width: fit-content;
             grid-template-columns: 1fr 1fr 1fr;
         }
+
         .image-wrapper,
         .upload-container {
-            max-width: 120px ; /* 3 images per row */
-            max-height: 120px ;
+            max-width: 120px;
+            /* 3 images per row */
+            max-height: 120px;
             margin: auto;
         }
     }
-    @media (max-width: 400px) { /* for very small screens */
+
+    @media (max-width: 400px) {
+
+        /* for very small screens */
         .image-wrapper,
         .upload-container {
-            max-width: 110px ; 
-            max-height: 110px ;
+            max-width: 110px;
+            max-height: 110px;
             margin: auto;
         }
     }
@@ -180,9 +185,11 @@
 
         line-height: 7px;
     }
-    a{
+
+    a {
         text-decoration: none;
     }
+
     input {
         padding: 0;
         border: 0px;
@@ -216,12 +223,11 @@
 <body>
     <input class="btn" type="text" id="boxname" placeholder="image box-name">
 
-    <a class="btn"   style="color: rgb(255, 255, 255); float: left; border: none;" href='index.html'>back</a>
-    <a class="btn"   style="color: rgb(255, 255, 255); float: left; border: none;" href='https://squoosh.app'>squoosh</a>
+    <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='index.html'>back</a>
+    <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='https://squoosh.app'>squoosh</a>
     <br>
     <br>
-    <button id="opencloseBtn" class="btn" onclick="clearbox()"
-        style="color: rgb(248, 140, 140);"><b>clear</b></button>
+    <button id="opencloseBtn" class="btn" onclick="clearbox()" style="color: rgb(248, 140, 140);"><b>clear</b></button>
     <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>reload</b></button>
     <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
     <div id="panel" class="panel">
@@ -370,13 +376,13 @@
             console.error('File input or files not found.');
             return;
         }
-        
+
         const files = Array.from(fileInput.files);
         const formData = new FormData();
         files.forEach(file => {
             formData.append('image', file);
         });
-        
+
         var boxname = getboxname();
         fetch('/api/uploadImage/' + boxname, {
             method: 'POST',
@@ -391,34 +397,6 @@
             .then(data => {
                 console.log(data);
                 refreshImageList(); // 假设有一个函数来刷新上传后的图片列表
-            })
-            .catch(error => {
-                console.error('请求出错:', error);
-            });
-    }
-
-
-    function handleDrop(event) {
-        event.preventDefault();
-        const files = Array.from(event.dataTransfer.files).slice(0, 10); // Limit to 10 files
-        const formData = new FormData();
-        files.forEach(file => {
-            formData.append('image', file);
-        });
-
-        fetch('/api/uploadImage/1', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP 错误！状态: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(data => {
-                console.log(data);
-                refreshImageList(); // Refresh the image list after uploading
             })
             .catch(error => {
                 console.error('请求出错:', error);
@@ -481,6 +459,76 @@
 
             xhr.send();
         }
+    }
+
+    
+    // 监听粘贴事件
+    document.addEventListener('paste', function (event) {
+        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        var file = null;
+
+        // 遍历粘贴板中的内容
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                file = items[i].getAsFile();
+                break;
+            }
+        }
+
+        if (file !== null) {
+            // 构建 FormData 对象
+            var formData = new FormData();
+            formData.append('image', file);
+
+            // 获取 boxname
+            var boxname = getboxname();
+
+            // 发送上传请求
+            fetch('/api/uploadImage/' + boxname, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP 错误！状态: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log(data);
+                    refreshImageList(); // 假设有一个函数来刷新上传后的图片列表
+                })
+                .catch(error => {
+                    console.error('请求出错:', error);
+                });
+        }
+    });
+
+    function handleDrop(event) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files).slice(0, 10); // Limit to 10 files
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('image', file);
+        });
+
+        fetch('/api/uploadImage/1', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP 错误！状态: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                refreshImageList(); // Refresh the image list after uploading
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
+            });
     }
 
 
