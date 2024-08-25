@@ -221,7 +221,7 @@
 </style>
 
 <body>
-    <input class="btn" type="text" id="boxname" placeholder="image box-name">
+    <input class="btn" type="text" id="boxname" onkeydown="handleKeyDown(event)" placeholder="image box-name">
 
     <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='index.html'>back</a>
     <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='https://squoosh.app'>squoosh</a>
@@ -239,7 +239,7 @@
                 <label for="file-upload" class="upload-label">
                     <span class="plus-icon">+</span>
                 </label>
-                <input type="file" id="file-upload" onchange="uploadImages()" class="file-upload" multiple>
+                <input type="file" id="file-upload" onchange="uploadImagesfromInput()" class="file-upload" multiple>
             </div>
         </div>
     </div>
@@ -280,14 +280,17 @@
     }
 </script>
 
-<script> // 上传 下载 reload 删除相关操作 
+<script>
+    var imagenamelist = [];
+    // 上传 下载 reload 删除相关操作 
     function getboxname() {
         var boxnameElement = document.getElementById('boxname');
         if (boxnameElement.value === "") {
             console.log('Boxname element not found,using 1 as default');
             return '1';
         } else {
-            console.log('Boxname:', boxnameElement.value);
+            // console.log('Boxname:', boxnameElement.value);
+            localStorage.setItem('image-box-name', boxnameElement.value);
             return boxnameElement.value;
         }
     }
@@ -300,6 +303,8 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var data = JSON.parse(xhr.responseText);
+                // console.log(data);
+                imagenamelist = data;
                 // Clear the existing images
                 var imageContainer = document.getElementById('image-container');
                 imageContainer.innerHTML = '';
@@ -316,6 +321,7 @@
 
                         var img = document.createElement('img');
                         img.src = 'images/' + boxname + '/' + image;
+                        img.alt = image; // 
                         img.className = 'image';
 
                         var deleteBtn = document.createElement('button');
@@ -353,7 +359,7 @@
                 fileUpload.id = 'file-upload';
                 fileUpload.className = 'file-upload';
                 fileUpload.setAttribute('multiple', '');
-                fileUpload.onchange = uploadImages;
+                fileUpload.onchange = uploadImagesfromInput;
 
                 uploadContainer.appendChild(uploadLabel);
                 uploadContainer.appendChild(fileUpload);
@@ -370,38 +376,31 @@
         xhr.send();
     }
 
-    function uploadImages() {
-        const fileInput = document.getElementById('file-upload');
+    function uploadImagesfromInput() {
+        var fileInput = document.getElementById('file-upload');
         if (!fileInput || !fileInput.files) {
             console.error('File input or files not found.');
             return;
         }
 
-        const files = Array.from(fileInput.files);
+        // 帮我补全函数
         const formData = new FormData();
-        files.forEach(file => {
-            formData.append('image', file);
-        });
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('image', fileInput.files[i]);
+        }
 
-        var boxname = getboxname();
-        fetch('/api/uploadImage/' + boxname, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP 错误！状态: ${response.status}`);
-                }
-                return response.text();
-            })
+
+        uploadImages(formData)
             .then(data => {
                 console.log(data);
-                refreshImageList(); // 假设有一个函数来刷新上传后的图片列表
+                refreshImageList(); // 上传后刷新图片列表
             })
             .catch(error => {
                 console.error('请求出错:', error);
             });
     }
+
+
 
     function deleteImageByUrl(url) {
         var x = confirm("Delete this image?");
@@ -461,7 +460,7 @@
         }
     }
 
-    
+
     // 监听粘贴事件
     document.addEventListener('paste', function (event) {
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -476,24 +475,13 @@
         }
 
         if (file !== null) {
-            // 构建 FormData 对象
-            var formData = new FormData();
-            formData.append('image', file);
+            // 构建 FormData 对象并确保文件名唯一
+            const formData = prepareFormData([file]);
 
             // 获取 boxname
             var boxname = getboxname();
 
-            // 发送上传请求
-            fetch('/api/uploadImage/' + boxname, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP 错误！状态: ${response.status}`);
-                    }
-                    return response.text();
-                })
+            uploadImages(formData, boxname)
                 .then(data => {
                     console.log(data);
                     refreshImageList(); // 假设有一个函数来刷新上传后的图片列表
@@ -504,15 +492,67 @@
         }
     });
 
+    // 处理文件上传的主函数
     function handleDrop(event) {
         event.preventDefault();
-        const files = Array.from(event.dataTransfer.files).slice(0, 10); // Limit to 10 files
+        const files = Array.from(event.dataTransfer.files).slice(0, 10); // 限制上传文件数为10
+        const formData = prepareFormData(files);
+
+        uploadImages(formData)
+            .then(data => {
+                console.log(data);
+                refreshImageList(); // 上传后刷新图片列表
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
+            });
+    }
+
+    // 准备 FormData 对象
+    function prepareFormData(files) {
         const formData = new FormData();
+
         files.forEach(file => {
-            formData.append('image', file);
+            const uniqueFileName = getUniqueFileName(file.name);
+            // 直接使用原始 Blob 生成新的文件对象
+            console.log('newFile:', uniqueFileName);
+
+            const newFile = new File([file], uniqueFileName, { type: file.type });
+            formData.append('image', newFile);
+            imagenamelist.push(uniqueFileName); // 更新已存在文件名列表
         });
 
-        fetch('/api/uploadImage/1', {
+        return formData;
+    }
+
+
+    // 获取唯一的文件名（防止冲突）
+    function getUniqueFileName(originalName) {
+        let modifiedName = originalName;
+        let counter = 1;
+
+        while (imagenamelist.includes(modifiedName)) {
+            const extensionIndex = originalName.lastIndexOf('.');
+            if (extensionIndex !== -1) {
+                // 文件名包含扩展名的情况
+                const nameWithoutExtension = originalName.substring(0, extensionIndex);
+                const extension = originalName.substring(extensionIndex);
+                modifiedName = `${nameWithoutExtension}-${counter}${extension}`;
+            } else {
+                // 没有扩展名的情况
+                modifiedName = `${originalName}-${counter}`;
+            }
+            counter++;
+        }
+
+        return modifiedName;
+    }
+
+    // 执行图片上传请求
+    function uploadImages(formData) {
+        // 获取 boxname
+        var boxname = getboxname();
+        return fetch('/api/uploadImage/' + boxname, {
             method: 'POST',
             body: formData
         })
@@ -521,18 +561,25 @@
                     throw new Error(`HTTP 错误！状态: ${response.status}`);
                 }
                 return response.text();
-            })
-            .then(data => {
-                console.log(data);
-                refreshImageList(); // Refresh the image list after uploading
-            })
-            .catch(error => {
-                console.error('请求出错:', error);
             });
     }
 
+    // 监听回车键(TEXT INPUT )
+    function handleKeyDown(event) {
+        if (event.key === 'Enter') {  // Check if the Enter key was pressed
+            event.preventDefault();  // Prevent the default action (e.g., form submission)
+            refreshImageList();         // Call the function you want to execute
+        }
+    }
+
+
 
     // auto do
+    //set boxname from localstorage
+    var boxname = localStorage.getItem('image-box-name');
+    if (boxname) {
+        document.getElementById('boxname').value = boxname;
+    }
     loadEmojiIcon('🏞️')
     refreshImageList()
     //wait .5s
