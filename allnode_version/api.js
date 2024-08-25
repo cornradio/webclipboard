@@ -23,13 +23,15 @@ app.get('/api/readfile/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     // 检查文件名是否合法
     let result = filter.check(fileName);
+    // 拼接文件路径
+    let filePath = path.join(__dirname,"public",'txts',fileName);
     if(result=='ok'){
         // 读取文件内容
         var time = new Date().toLocaleString();
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         ip = ip.replace('::ffff:', '');
         console.log(`${time} ${ip} Reading file ${fileName}...`);
-        const content = filemanager.readFile(fileName);
+        const content = filemanager.readFile(filePath);
         res.send(content);
     }else{
         res.status(400).send(result);
@@ -40,6 +42,8 @@ app.use(express.json());
 app.post('/api/writefile/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     const content = req.body.content; // 从请求体中获取content参数
+    // 拼接文件路径
+    let filePath = path.join(__dirname,"public",'txts',fileName);
   
     let result = filter.check(fileName);
     if(result=='ok'){
@@ -48,13 +52,15 @@ app.post('/api/writefile/:fileName', (req, res) => {
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         ip = ip.replace('::ffff:', '');
         console.log(`${time} ${ip} Writing file ${fileName}...`);
-        filemanager.writeFile(fileName, content);
+        filemanager.writeFile(filePath, content);
         // 写入文件内容
         res.send('OK');
     }else{
         res.status(400).send(result);
     }
 });
+
+
 
 // 获取图片列表 
 // response like ["a.png","b.png"]

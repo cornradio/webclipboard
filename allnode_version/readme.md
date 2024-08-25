@@ -52,7 +52,18 @@ Post body (json)
 
 ## docker build 
 ```
-docker build -t kasusa/webclipboard-v2.0:20240703 .
-docker run -d -p 8000:3000  kasusa/webclipboard-v2.0
-docker push kasusa/webclipboard-v2.0:20240703
+docker build -t kasusa/webclipboard-v2.0:20240825v2 .
+docker run -d -p 8000:3000  kasusa/webclipboard-v2.0:20240825v2
+docker push kasusa/webclipboard-v2.0:20240825v2
+```
+
+## docker run 
+可以使用 -v 参数来挂载本地目录到容器中 ， 这样即使更新版本，也会保留文件  
+并且更方便从外部查看和修改
+
+```
+docker run -d -p 8000:3000 `
+    -v "C:\Users\Admin\Downloads\test\txt:/home/node/app/public/txts" `
+    -v "C:\Users\Admin\Downloads\test\img:/home/node/app/public/images" `
+    kasusa/webclipboard-v2.0:20240825v2
 ```

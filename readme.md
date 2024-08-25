@@ -52,7 +52,20 @@ docker rmi -f registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20
 
 下载新版并运行
 ```
-docker pull registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20240717
+docker pull registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20240825v2
 docker image ls
-docker run -d -p 88:3000  registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20240717
+docker run -d -p 88:3000  registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20240825v2
+```
+
+挂载本地目录到容器中，这样即使更新版本，也会保留文件
+下面命令以 Linux 作为演示
+```
+# 创建目录 
+mkdir -p /home/webclipboard/txts /home/webclipboard/imgs
+# 可以自行放置一个 imgs/bg/bg.jpg 会被用来当做images功能的背景图片
+
+docker run -d -p 88:3000 \
+-v /home/webclipboard/txts:/home/node/app/public/txts \
+-v /home/imgs:/home/node/app/public/images \
+registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20240825v2
 ```
