@@ -76,3 +76,7 @@ curl \
 -d "{\"content\": \"$(awk '{printf "%s\\n", $0}' a.json | sed 's/"/\\"/g')\"}"
 
 ```
+## 类似tool
+https://fagedongxi.com/  
+https://getnote.top/  
+https://hackmd.io/?nav=overview
