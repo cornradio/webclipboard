@@ -1,3 +1,5 @@
+
+
 # quick test
 ```
 node api.js
@@ -28,7 +30,7 @@ node api.js
 use screen
 ```bash
 screen -S webPasteApi
-cd /var/www/html/webclipboard/my-api
+cd /home/webclipboard/allnode_version
 node api.js
 ```
 
@@ -52,9 +54,9 @@ Post body (json)
 
 ## docker build 
 ```
-docker build -t kasusa/webclipboard-v2.0:20240825v2 .
-docker run -d -p 8000:3000  kasusa/webclipboard-v2.0:20240825v2
-docker push kasusa/webclipboard-v2.0:20240825v2
+docker build -t kasusa/webclipboard-v2.0:20250111 .
+docker run -d -p 8000:3000  kasusa/webclipboard-v2.0:20250111
+docker push kasusa/webclipboard-v2.0:20250111
 ```
 
 ## docker run 

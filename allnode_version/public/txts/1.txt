@@ -1,0 +1,5 @@
+github：https://github.com/cornradio/webclipboard
+hint：
+1. 按下ctrl+s保存文件，或者点击右侧按钮
+2. 左上角可以看到历史记录
+3. F11切换全屏
