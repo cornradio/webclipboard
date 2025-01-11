@@ -375,29 +375,30 @@
 
         // Keyboard event listener 
         document.addEventListener('keydown', function (event) {
-            if (event.ctrlKey && event.key === 'b') {
+            if ((event.ctrlKey||event.metaKey) && event.key === 'b') {
                 event.preventDefault();
                 toggleDarkMode();
             }
-            if (event.ctrlKey && event.key === 's') {
+            if ((event.ctrlKey||event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 saveButton.click();
             }
-            if (event.ctrlKey && event.key === 'l') {
+            if ((event.ctrlKey||event.metaKey) && event.key === 'l') {
                 event.preventDefault();
                 loadButton.click();
             }
-            if (event.key === 'F11') {
+            if (event.key === 'F11' || 
+            ((event.ctrlKey||event.metaKey) && event.key === 'm')) {
                 event.preventDefault();
                 toggleBigMode();
             }
             //savebutton
-            if (event.ctrlKey && event.shiftKey && event.key === 'C') {
+            if ((event.ctrlKey||event.metaKey) && event.shiftKey && event.key === 'C') {
                 event.preventDefault();
                 CopyAll();
             }
             //sharebutton
-            if (event.ctrlKey && event.shiftKey && event.key === 'S') {
+            if ((event.ctrlKey||event.metaKey) && event.shiftKey && event.key === 'S') {
                 event.preventDefault();
                 Share();
             }
