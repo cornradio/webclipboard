@@ -59,6 +59,12 @@ docker run -d -p 8000:3000  kasusa/webclipboard-v2.0:20250111
 docker push kasusa/webclipboard-v2.0:20250111
 ```
 
+## docker save to file
+```
+docker save -o webclipboard.tar kasusa/webclipboard-v2.0:20250111
+docker load -i webclipboard.tar
+```
+
 ## docker run 
 可以使用 -v 参数来挂载本地目录到容器中 ， 这样即使更新版本，也会保留文件  
 并且更方便从外部查看和修改
