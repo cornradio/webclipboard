@@ -75,7 +75,8 @@ mkdir -p /home/webclipboard/txts /home/webclipboard/imgs
 docker run -d -p 88:3000 \
 -v /home/webclipboard/txts:/home/node/app/public/txts \
 -v /home/webclipboard/imgs:/home/node/app/public/images \
-registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20240825v2
+registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20250111
+
 ```
 
 ## linux 下使用（curl命令）
