@@ -73,5 +73,5 @@ docker load -i webclipboard.tar
 docker run -d -p 8000:3000 `
     -v "C:\Users\Admin\Downloads\test\txt:/home/node/app/public/txts" `
     -v "C:\Users\Admin\Downloads\test\img:/home/node/app/public/images" `
-    kasusa/webclipboard-v2.0:20240825v2
+    kasusa/webclipboard-v2.0:20250111
 ```
