@@ -37,12 +37,15 @@ echo "服务已启动，请访问 http://<你的服务器ip>:3000 使用剪切�
 
 
 ## 截图
-![1](images/image.png)
+![image](https://github.com/user-attachments/assets/f489f649-71de-4ff1-bfff-adadece727c5)
+
+
 <div align="center">
 	<img src="images/image2.jpg" alt="Editor" width="500">
 </div>
 
-![图片上传功能](https://raw.githubusercontent.com/cornradio/imgs/main/blog/Clip_2024-07-17_19-45-13.png)
+![image](https://github.com/user-attachments/assets/ba174d9c-311a-4b44-8171-61a7a4c71aef)
+
 
 ## 历史记录功能
 - 使用 `localStorage` 保存本地访问过的文件名历史记录
