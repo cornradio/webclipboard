@@ -33,7 +33,7 @@ echo "服务已启动，请访问 http://<你的服务器ip>:3000 使用剪切�
 
 使用方法2(docker)：  
 参考本文底部的 [docker部署章节](#docker)  
-❗注意目前 docker 版本数据都存在 docker 内部，升级时不能保存历史数据文件...
+
 
 
 ## 截图
@@ -47,6 +47,7 @@ echo "服务已启动，请访问 http://<你的服务器ip>:3000 使用剪切�
 ## 历史记录功能
 - 使用 `localStorage` 保存本地访问过的文件名历史记录
 - 通过鼠标移动到网页左上角的方式查看历史记录
+  
 ![历史记录](https://raw.githubusercontent.com/cornradio/imgs/main/blog/Clip_2024-07-17_19-47-01.png)
 
 # docker
