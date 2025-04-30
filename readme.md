@@ -1,5 +1,8 @@
 ## 在线剪切板
-使用方法1(源码)：
+
+<details>
+<summary>使用方法1(源码)：</summary>
+
 1. git clone 本项目到服务器
 2. 进入 `allnode_version/` 目录下
 3. 安装 node 环境 
@@ -30,6 +33,8 @@ node api.js &  # 使用 & 让服务在后台运行
 # 6. 访问 `http://<你的服务器ip>:3000` 即可使用剪切版
 echo "服务已启动，请访问 http://<你的服务器ip>:3000 使用剪切版"
 ```
+</details>
+
 
 使用方法2(docker)：  
 参考本文底部的 [docker部署章节](#docker)  
@@ -55,33 +60,34 @@ echo "服务已启动，请访问 http://<你的服务器ip>:3000 使用剪切�
 
 # docker
 
-## docker 一键部署 (从dockerhub下载)
+## docker 一键部署 
 [dockerhub](https://hub.docker.com/r/kasusa/webclipboard-v2.0)
 
 ```shell
-docker run -dp 80:3000 kasusa/webclipboard-v1.0
 docker run -dp 80:3000 kasusa/webclipboard-v2.0
+# 可选国内镜像
+registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0
 ```
-v1.0 和 v2.0 的区别：
-kasusa/webclipboard-v2.0 增加了图片存储功能; v1.0 只有存储文字的功能。
 
-
-浏览器访问 `http://<服务器ip>` 即可使用剪切版  
+浏览器访问 `http://<服务器ip>:80` 即可使用webclip
 如果需要自行编译其他架构： 请进入 `allnode_version\` 文件夹 ，装好node后执行 `docker build .`
 
-## docker 一键部署 (从阿里云容器服务下载)
+## docker 一键部署 (自定义数据存放位置)
 
-```
-# 创建目录 
+```SH
+# 创建目录用于存放数据,方便以后升级
 mkdir -p /home/webclipboard/txts /home/webclipboard/imgs
-# 可以自行放置一个 imgs/bg/bg.jpg 会被用来当做images功能的背景图片
 
+# 可以自行放置一个 imgs/bg/bg.jpg 会被用来当做images功能的背景图片
 docker run -d -p 88:3000 \
 -v /home/webclipboard/txts:/home/node/app/public/txts \
 -v /home/webclipboard/imgs:/home/node/app/public/images \
-registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0:20250111
+registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0
 
 ```
+
+浏览器访问 `http://<服务器ip>:88` 即可使用webclip
+
 
 ## linux 下使用（curl命令）
 
