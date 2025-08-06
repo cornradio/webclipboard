@@ -65,30 +65,34 @@ app.post('/api/writefile/:fileName', (req, res) => {
 // 获取图片列表 
 // response like ["a.png","b.png"]
 app.get('/api/getImageList/:boxname', (req, res) => {
-    const fileName = req.params.boxname;
+    const boxname = req.params.boxname;
     // 检查boxname是否合法
-    let result = filter.checkimageboxname(fileName);
+    let result = filter.checkimageboxname(boxname);
     
     if (result === 'ok') {
-        const folderPath = path.join('public', 'images', fileName);
+        const folderPath = path.join(__dirname, 'public', 'images', boxname);
 
         // Ensure the parent directories exist
-        fs.mkdirSync(path.join('public', 'images'), { recursive: true });
+        fs.mkdirSync(path.join(__dirname, 'public', 'images'), { recursive: true });
 
         if (fs.existsSync(folderPath)) {
             fs.readdir(folderPath, (err, files) => {
                 if (err) {
+                    console.error(`读取文件夹错误: ${err.message}`);
                     res.status(500).send('Internal Server Error');
                 } else {
+                    console.log(`文件夹 ${folderPath} 中的文件:`, files);
                     res.send(files);
                 }
             });
         } else {
+            console.log(`文件夹不存在，创建: ${folderPath}`);
             fs.mkdirSync(folderPath);
             res.send([]);
         }
     } else {
-        res.status(400).send(result);
+        console.log(`恶意访问尝试 - boxname: ${boxname}, 原因: ${result}`);
+        res.status(403).send('禁止：' + result);
     }
 });
 
@@ -96,7 +100,18 @@ app.get('/api/getImageList/:boxname', (req, res) => {
 // 设置存储上传文件的配置
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const folderPath = path.join(__dirname, 'public', 'images', req.params.boxname);
+        // 获取原始的URL参数，避免Express自动解码
+        const originalUrl = req.originalUrl || req.url;
+        const boxnameMatch = originalUrl.match(/\/api\/uploadImage\/([^\/\?]+)/);
+        const boxname = boxnameMatch ? boxnameMatch[1] : req.params.boxname;
+        
+        // 先验证boxname是否合法
+        let result = filter.checkimageboxname(boxname);
+        if (result !== 'ok') {
+            return cb(new Error(result));
+        }
+        
+        const folderPath = path.join(__dirname, 'public', 'images', boxname);
         // 如果文件夹不存在，创建它
         if (!fs.existsSync(folderPath)) {
             fs.mkdirSync(folderPath, { recursive: true });
@@ -104,6 +119,11 @@ const storage = multer.diskStorage({
         cb(null, folderPath);
     },
     filename: function (req, file, cb) {
+        // 验证文件名是否合法
+        let filenameResult = filter.checkImageFilename(file.originalname);
+        if (filenameResult !== 'ok') {
+            return cb(new Error(filenameResult));
+        }
         cb(null, file.originalname);
     }
 });
@@ -111,18 +131,55 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => { 
+    const boxname = req.params.boxname;
+    // 检查boxname是否合法
+    let result = filter.checkimageboxname(boxname);
+    if (result !== 'ok') {
+        console.log(`恶意上传尝试 - boxname: ${boxname}, 原因: ${result}`);
+        return res.status(403).send('禁止：' + result);
+    }
+    
+    // 检查上传的文件名是否合法
     if (req.files && req.files.length > 0) {
-        res.status(200).send('图片上传成功');
+        console.log(`上传了 ${req.files.length} 个文件:`);
+        for (let file of req.files) {
+            console.log(`- 文件名: ${file.originalname}`);
+            console.log(`- 保存路径: ${file.path}`);
+            console.log(`- 文件大小: ${file.size} bytes`);
+            
+            let filenameResult = filter.checkImageFilename(file.originalname);
+            if (filenameResult !== 'ok') {
+                console.log(`恶意文件上传尝试 - 文件名: ${file.originalname}, 原因: ${filenameResult}`);
+                return res.status(403).send('禁止：' + filenameResult);
+            }
+        }
+        res.status(200).send('scs');
     } else {
         res.status(400).send('未成功上传图片');
     }
 });
 
-
 // 删除图片
 app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
-    const folderPath = path.join(__dirname, 'public', 'images', req.params.boxname);
-    const filePath = path.join(folderPath, req.params.filename);
+    const boxname = req.params.boxname;
+    const filename = req.params.filename;
+    
+    // 检查boxname是否合法
+    let result = filter.checkimageboxname(boxname);
+    if (result !== 'ok') {
+        console.log(`恶意删除尝试 - boxname: ${boxname}, 原因: ${result}`);
+        return res.status(403).send('禁止：' + result);
+    }
+    
+    // 检查文件名是否合法
+    let filenameResult = filter.checkImageFilename(filename);
+    if (filenameResult !== 'ok') {
+        console.log(`恶意删除尝试 - filename: ${filename}, 原因: ${filenameResult}`);
+        return res.status(403).send('禁止：' + filenameResult);
+    }
+    
+    const folderPath = path.join(__dirname, 'public', 'images', boxname);
+    const filePath = path.join(folderPath, filename);
 
     // 检查文件是否存在
     if (fs.existsSync(filePath)) {
@@ -141,7 +198,16 @@ app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
 
 // 删除imagebox
 app.post('/api/clearBox/:boxname', (req, res) => {
-    const folderPath = path.join(__dirname, 'public', 'images', req.params.boxname);
+    const boxname = req.params.boxname;
+    
+    // 检查boxname是否合法
+    let result = filter.checkimageboxname(boxname);
+    if (result !== 'ok') {
+        console.log(`恶意清空尝试 - boxname: ${boxname}, 原因: ${result}`);
+        return res.status(403).send('禁止：' + result);
+    }
+    
+    const folderPath = path.join(__dirname, 'public', 'images', boxname);
 
     // 检查文件夹是否存在
     if (fs.existsSync(folderPath)) {
@@ -174,6 +240,26 @@ app.post('/api/clearBox/:boxname', (req, res) => {
     }
 });
 
+// 处理multer错误
+app.use((error, req, res, next) => {
+    if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).send('文件大小超出限制');
+        }
+        if (error.code === 'LIMIT_FILE_COUNT') {
+            return res.status(400).send('文件数量超出限制');
+        }
+        return res.status(400).send('文件上传错误: ' + error.message);
+    }
+    
+    // 处理自定义验证错误（恶意上传）
+    if (error.message) {
+        console.log(`恶意上传被拦截: ${error.message}`);
+        return res.status(403).send('禁止：' + error.message);
+    }
+    
+    next(error);
+});
 
 // 启动服务器
 app.listen(port,() => {
