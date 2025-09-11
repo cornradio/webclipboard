@@ -219,7 +219,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                text-indent: -9999px;
+                /* text-indent: -9999px; */
+                color: #ffffff00;
                 overflow: hidden;
             }
 
@@ -230,12 +231,12 @@
                 position: absolute;
             }
 
-            #saveFile::before { content: "\f0ee"; } /* fa-cloud-upload */
-            #loadFile::before { content: "\f019"; } /* fa-download */
-            #CopyAll::before { content: "\f0c5"; }
-            #Share::before { content: "\f1e0"; }
-            #images::before { content: "\f03e"; }
-            #toggleMode::before { content: "\f186"; }
+            #saveFile::before { content: "\f0ee"; color: #666;} /* fa-cloud-upload */
+            #loadFile::before { content: "\f019"; color: #666;} /* fa-download */
+            #CopyAll::before { content: "\f0c5"; color: #666;}
+            #Share::before { content: "\f1e0"; color: #666;}
+            #images::before { content: "\f03e"; color: #666;}
+            #toggleMode::before { content: "\f186"; color: #666;}
 
         }
         /* buttons */
@@ -243,7 +244,7 @@
             margin-top: 8px;
             border: transparent solid 1px;
             background-color: transparent;
-            display: list-item;
+            /* display: list-item; fix firefox problem*/ 
             color: #666;
         }
 
