@@ -51,7 +51,11 @@
         .fullscreen-btn.dark-mode:hover {
             background-color: #666;
         }
-
+        /* 按钮容器纵向排列 */
+        .button-row {
+            display: contents;
+            justify-content: center;
+        }
         /* 在小屏幕下隐藏全屏按钮 */
         @media (max-width: 1200px) {
             .fullscreen-btn {
@@ -176,6 +180,10 @@
             .buttons-box {
                 width: 100%;
                 display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                padding: 8px;
             }
 
             .hidden_on_iphone {
@@ -185,8 +193,51 @@
             textarea {
                 height: 55vh;
             }
-        }
 
+            /* 输入框和选择框保持原样 */
+            #fileName, #selectOldFile {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            /* 按钮容器横向排列 */
+            .button-row {
+                display: flex;
+                justify-content: center;
+                gap: 0px;
+                flex-wrap: wrap;
+            }
+
+            /* 手机端按钮图标样式 */
+            .button-row button {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                padding: 0;
+                margin: 0;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-indent: -9999px;
+                overflow: hidden;
+            }
+
+            .button-row button::before {
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                text-indent: 0;
+                position: absolute;
+            }
+
+            #saveFile::before { content: "\f0ee"; } /* fa-cloud-upload */
+            #loadFile::before { content: "\f019"; } /* fa-download */
+            #CopyAll::before { content: "\f0c5"; }
+            #Share::before { content: "\f1e0"; }
+            #images::before { content: "\f03e"; }
+            #toggleMode::before { content: "\f186"; }
+
+        }
         /* buttons */
         button {
             margin-top: 8px;
@@ -195,6 +246,8 @@
             display: list-item;
             color: #666;
         }
+
+
 
         /* button hover float hover box */
         button:hover i {
@@ -310,12 +363,15 @@
         <div class="buttons-box">
             <input type="text" id="fileName" placeholder="xxx.txt" value="1.txt">
             <select id="selectOldFile"></select>
-            <button id="saveFile">Save <i>Ctrl + S</i></button>
-            <button id="loadFile" class="hidden_on_iphone">Load <i>Ctrl + L</i></button>
-            <button id="CopyAll" onclick="CopyAll()">Copy <i>Ctrl + shift + C</i></button>
-            <button id="Share" class="" onclick="Share()">Share <i>Ctrl + shift + S</i></button>
-            <button id="images" onclick="javascript:location.href = 't2.html'">images <i>Ctrl + I</i></button>
-            <button id="toggleMode">Dark Mode <i>Ctrl + B</i></button>
+            <div class="button-row">
+                <button id="saveFile">Save<i>Ctrl + S</i></button>
+                <button id="loadFile">Load<i>Ctrl + L</i></button>
+                <button id="CopyAll" onclick="CopyAll()">Copy<i>Ctrl + shift + C</i></button>
+                <button id="Share" onclick="Share()">Share<i>Ctrl + shift + S</i></button>
+                <button id="images" onclick="javascript:location.href = 't2.html'">Images<i>Ctrl + I</i>
+                </button>
+                <button id="toggleMode">Dark Mode<i>Ctrl + B</i></button>
+            </div>
         </div>
 
         <div id="toastContainer"></div>
