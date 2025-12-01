@@ -54,10 +54,10 @@ Post body (json)
 
 ## docker build 
 ```
-docker build -t kasusa/webclipboard-v2.0:20250920 .
-docker run -d -p 80:3000  kasusa/webclipboard-v2.0:20250920
-docker push kasusa/webclipboard-v2.0:20250920
-docker tag kasusa/webclipboard-v2.0:20250920 kasusa/webclipboard-v2.0:latest
+docker build -t kasusa/webclipboard-v2.0:20251201 .
+docker run -d -p 80:3000  kasusa/webclipboard-v2.0:20251201
+docker push kasusa/webclipboard-v2.0:20251201
+docker tag kasusa/webclipboard-v2.0:20251201 kasusa/webclipboard-v2.0:latest
 docker push kasusa/webclipboard-v2.0:latest
 ```
 
