@@ -282,43 +282,122 @@
         font-size: 30px;
         cursor: pointer;
     }
+
+    .size-info {
+        color: #aaa;
+        font-size: 12px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .toggle-container {
+        float: right;
+        display: flex;
+        align-items: center;
+        margin: 5px;
+        font-size: 13px;
+        color: #aaa;
+        gap: 8px;
+    }
+
+    /* iOS Style Switch */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 20px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #333;
+        transition: .3s;
+        border-radius: 20px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider {
+        background-color: #34c759;
+    }
+
+    input:focus+.slider {
+        box-shadow: 0 0 1px #34c759;
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(14px);
+    }
 </style>
 
 <body>
     <input class="btn" type="text" id="boxname" onkeydown="handleKeyDown(event)" placeholder="image box-name">
 
-    <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='index.html'>< Back</a>
-    <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='https://squoosh.app'>Squoosh</a>
-    <br>
-    <br>
-    <button id="opencloseBtn" class="btn" onclick="clearbox()" style="color: rgb(248, 140, 140);"><b>clear</b></button>
-    <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>reload</b></button>
-    <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
-    <div id="panel" class="panel">
-
-        <div id="image-container" class="image-container">
-            <!-- add here -->
-            <div class="upload-container" ondragover="event.preventDefault()" ondragenter="event.preventDefault()"
-                ondrop="handleDrop(event)">
-                <label for="file-upload" class="upload-label">
-                    <span class="plus-icon">+</span>
+    <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='index.html'>
+        < Back</a>
+            <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;"
+                href='https://squoosh.app'>Squoosh</a>
+            <br>
+            <br>
+            <button id="opencloseBtn" class="btn" onclick="clearbox()"
+                style="color: rgb(248, 140, 140);"><b>clear</b></button>
+            <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>reload</b></button>
+            <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="autoCompress" onchange="saveCompressState()">
+                    <span class="slider"></span>
                 </label>
-                <input type="file" id="file-upload" onchange="uploadImagesfromInput()" class="file-upload" multiple>
+                <label for="autoCompress">Auto Compress</label>
             </div>
-        </div>
-    </div>
+            <div id="panel" class="panel">
 
-    <!-- 添加模态窗口 -->
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <img id="modalImage" class="modal-image">
-            <div class="modal-buttons">
-                <button class="modal-btn" onclick="copyImageUrl()">复制链接</button>
-                <button class="modal-btn" onclick="deleteCurrentImage()">删除图片</button>
+                <div id="image-container" class="image-container">
+                    <!-- add here -->
+                    <div class="upload-container" ondragover="event.preventDefault()"
+                        ondragenter="event.preventDefault()" ondrop="handleDrop(event)">
+                        <label for="file-upload" class="upload-label">
+                            <span class="plus-icon">+</span>
+                        </label>
+                        <input type="file" id="file-upload" onchange="uploadImagesfromInput()" class="file-upload"
+                            multiple>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+
+            <!-- 添加模态窗口 -->
+            <div id="imageModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <img id="modalImage" class="modal-image">
+                    <div id="imageSize" class="size-info"></div>
+                    <div class="modal-buttons">
+                        <button class="modal-btn" onclick="copyImageUrl()">复制链接</button>
+                        <button class="modal-btn" onclick="deleteCurrentImage()">删除图片</button>
+                    </div>
+                </div>
+            </div>
 </body>
 
 </html>
@@ -399,7 +478,7 @@
                         img.src = 'images/' + boxname + '/' + image;
                         img.alt = image; // 
                         img.className = 'image';
-                        img.onclick = function() { showImage(image); }; // 添加点击事件
+                        img.onclick = function () { showImage(image); }; // 添加点击事件
 
                         var deleteBtn = document.createElement('button');
                         deleteBtn.className = 'delete-btn';
@@ -453,19 +532,14 @@
         xhr.send();
     }
 
-    function uploadImagesfromInput() {
+    async function uploadImagesfromInput() {
         var fileInput = document.getElementById('file-upload');
         if (!fileInput || !fileInput.files) {
             console.error('File input or files not found.');
             return;
         }
 
-        // 帮我补全函数
-        const formData = new FormData();
-        for (let i = 0; i < fileInput.files.length; i++) {
-            formData.append('image', fileInput.files[i]);
-        }
-
+        const formData = await prepareFormData(Array.from(fileInput.files));
 
         uploadImages(formData)
             .then(data => {
@@ -539,7 +613,7 @@
 
 
     // 监听粘贴事件
-    document.addEventListener('paste', function (event) {
+    document.addEventListener('paste', async function (event) {
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
         var file = null;
 
@@ -553,7 +627,7 @@
 
         if (file !== null) {
             // 构建 FormData 对象并确保文件名唯一
-            const formData = prepareFormData([file]);
+            const formData = await prepareFormData([file]);
 
             // 获取 boxname
             var boxname = getboxname();
@@ -570,10 +644,10 @@
     });
 
     // 处理文件上传的主函数
-    function handleDrop(event) {
+    async function handleDrop(event) {
         event.preventDefault();
         const files = Array.from(event.dataTransfer.files).slice(0, 10); // 限制上传文件数为10
-        const formData = prepareFormData(files);
+        const formData = await prepareFormData(files);
 
         uploadImages(formData)
             .then(data => {
@@ -586,20 +660,76 @@
     }
 
     // 准备 FormData 对象
-    function prepareFormData(files) {
+    async function prepareFormData(files) {
         const formData = new FormData();
+        const autoCompress = document.getElementById('autoCompress').checked;
 
-        files.forEach(file => {
-            const uniqueFileName = getUniqueFileName(file.name);
-            // 直接使用原始 Blob 生成新的文件对象
+        for (const file of files) {
+            let fileToUpload = file;
+            if (autoCompress && file.type.startsWith('image/')) {
+                try {
+                    fileToUpload = await compressImage(file);
+                } catch (e) {
+                    console.error('Compression failed:', e);
+                }
+            }
+
+            const uniqueFileName = getUniqueFileName(fileToUpload.name);
             console.log('newFile:', uniqueFileName);
 
-            const newFile = new File([file], uniqueFileName, { type: file.type });
+            const newFile = new File([fileToUpload], uniqueFileName, { type: fileToUpload.type });
             formData.append('image', newFile);
-            imagenamelist.push(uniqueFileName); // 更新已存在文件名列表
-        });
+            imagenamelist.push(uniqueFileName);
+        }
 
         return formData;
+    }
+
+    function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Max dimensions
+                    const MAX_WIDTH = 1920;
+                    const MAX_HEIGHT = 1080;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(blob => {
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        resolve(compressedFile);
+                    }, 'image/jpeg', 0.8); // 0.8 quality
+                };
+                img.onerror = reject;
+            };
+            reader.onerror = reject;
+        });
     }
 
 
@@ -657,6 +787,24 @@
     if (boxname) {
         document.getElementById('boxname').value = boxname;
     }
+
+    // Load and set compress state
+    function loadCompressState() {
+        const savedState = localStorage.getItem('auto-compress-enabled');
+        const compressToggle = document.getElementById('autoCompress');
+        if (savedState === null) {
+            compressToggle.checked = true; // Default to true if never set
+        } else {
+            compressToggle.checked = savedState === 'true';
+        }
+    }
+
+    function saveCompressState() {
+        const isEnabled = document.getElementById('autoCompress').checked;
+        localStorage.setItem('auto-compress-enabled', isEnabled);
+    }
+
+    loadCompressState();
     loadEmojiIcon('🏞️')
     refreshImageList()
     //wait .5s
@@ -671,12 +819,12 @@
     let currentImageUrl = '';
 
     // 关闭模态窗口
-    closeModal.onclick = function() {
+    closeModal.onclick = function () {
         modal.style.display = 'none';
     }
 
     // 点击模态窗口外部关闭
-    modal.onclick = function(event) {
+    modal.onclick = function (event) {
         if (event.target === modal) {
             modal.style.display = 'none';
         }
@@ -687,11 +835,11 @@
         const boxname = getboxname();
         const fullUrl = window.location.origin + '/images/' + boxname + '/' + currentImageUrl;
         const copyBtn = document.querySelector('.modal-btn:first-child');
-        
+
         navigator.clipboard.writeText(fullUrl).then(() => {
             copyBtn.textContent = '已复制';
             copyBtn.classList.add('success');
-            
+
             setTimeout(() => {
                 copyBtn.textContent = '复制链接';
                 copyBtn.classList.remove('success');
@@ -703,15 +851,34 @@
 
     // 删除当前显示的图片
     function deleteCurrentImage() {
-            deleteImageByUrl(currentImageUrl);
-            modal.style.display = 'none';
+        deleteImageByUrl(currentImageUrl);
+        modal.style.display = 'none';
     }
 
     // 修改图片点击事件
     function showImage(url) {
         currentImageUrl = url;
         const boxname = getboxname();
-        modalImg.src = 'images/' + boxname + '/' + url;
+        const fullPath = 'images/' + boxname + '/' + url;
+        modalImg.src = fullPath;
+
+        // Fetch file size
+        document.getElementById('imageSize').textContent = 'Loading size...';
+        fetch(fullPath, { method: 'HEAD' })
+            .then(res => {
+                const size = res.headers.get('content-length');
+                if (size) {
+                    const kb = (size / 1024).toFixed(2);
+                    const mb = (size / (1024 * 1024)).toFixed(2);
+                    document.getElementById('imageSize').textContent = kb > 1024 ? `${mb} MB` : `${kb} KB`;
+                } else {
+                    document.getElementById('imageSize').textContent = 'Size unknown';
+                }
+            })
+            .catch(() => {
+                document.getElementById('imageSize').textContent = 'Size fetch failed';
+            });
+
         modal.style.display = 'flex';
     }
 </script>

@@ -10,8 +10,18 @@ const port = 3000;
 const filemanager = require('./filemanager');
 const filter = require('./filter');
 
-// 设置静态文件目录
-app.use(express.static(path.join(__dirname, 'public')));
+// 设置静态文件目录，并允许跨域（CORS）以及设置缓存，方便作为图床使用
+app.use(express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res, path) => {
+        res.set('Access-Control-Allow-Origin', '*');
+        res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.set('Timing-Allow-Origin', '*');
+        // 为图片设置长期缓存
+        if (path.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+            res.set('Cache-Control', 'public, max-age=31536000');
+        }
+    }
+}));
 
 // 定义路由
 app.get('/', (req, res) => {
@@ -24,8 +34,8 @@ app.get('/api/readfile/:fileName', (req, res) => {
     // 检查文件名是否合法
     let result = filter.check(fileName);
     // 拼接文件路径
-    let filePath = path.join(__dirname,"public",'txts',fileName);
-    if(result=='ok'){
+    let filePath = path.join(__dirname, "public", 'txts', fileName);
+    if (result == 'ok') {
         // 读取文件内容
         var time = new Date().toLocaleString();
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -33,7 +43,7 @@ app.get('/api/readfile/:fileName', (req, res) => {
         console.log(`${time} ${ip} Reading file ${fileName}...`);
         const content = filemanager.readFile(filePath);
         res.send(content);
-    }else{
+    } else {
         res.status(400).send(result);
     }
 });
@@ -43,10 +53,10 @@ app.post('/api/writefile/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     const content = req.body.content; // 从请求体中获取content参数
     // 拼接文件路径
-    let filePath = path.join(__dirname,"public",'txts',fileName);
-  
+    let filePath = path.join(__dirname, "public", 'txts', fileName);
+
     let result = filter.check(fileName);
-    if(result=='ok'){
+    if (result == 'ok') {
         // 读取文件内容
         var time = new Date().toLocaleString();
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -55,7 +65,7 @@ app.post('/api/writefile/:fileName', (req, res) => {
         filemanager.writeFile(filePath, content);
         // 写入文件内容
         res.send('OK');
-    }else{
+    } else {
         res.status(400).send(result);
     }
 });
@@ -68,7 +78,7 @@ app.get('/api/getImageList/:boxname', (req, res) => {
     const boxname = req.params.boxname;
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);
-    
+
     if (result === 'ok') {
         const folderPath = path.join(__dirname, 'public', 'images', boxname);
 
@@ -104,13 +114,13 @@ const storage = multer.diskStorage({
         const originalUrl = req.originalUrl || req.url;
         const boxnameMatch = originalUrl.match(/\/api\/uploadImage\/([^\/\?]+)/);
         const boxname = boxnameMatch ? boxnameMatch[1] : req.params.boxname;
-        
+
         // 先验证boxname是否合法
         let result = filter.checkimageboxname(boxname);
         if (result !== 'ok') {
             return cb(new Error(result));
         }
-        
+
         const folderPath = path.join(__dirname, 'public', 'images', boxname);
         // 如果文件夹不存在，创建它
         if (!fs.existsSync(folderPath)) {
@@ -130,7 +140,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => { 
+app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
     const boxname = req.params.boxname;
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);
@@ -138,7 +148,7 @@ app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
         console.log(`恶意上传尝试 - boxname: ${boxname}, 原因: ${result}`);
         return res.status(403).send('禁止：' + result);
     }
-    
+
     // 检查上传的文件名是否合法
     if (req.files && req.files.length > 0) {
         console.log(`上传了 ${req.files.length} 个文件:`);
@@ -146,7 +156,7 @@ app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
             console.log(`- 文件名: ${file.originalname}`);
             console.log(`- 保存路径: ${file.path}`);
             console.log(`- 文件大小: ${file.size} bytes`);
-            
+
             let filenameResult = filter.checkImageFilename(file.originalname);
             if (filenameResult !== 'ok') {
                 console.log(`恶意文件上传尝试 - 文件名: ${file.originalname}, 原因: ${filenameResult}`);
@@ -163,21 +173,21 @@ app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
 app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
     const boxname = req.params.boxname;
     const filename = req.params.filename;
-    
+
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);
     if (result !== 'ok') {
         console.log(`恶意删除尝试 - boxname: ${boxname}, 原因: ${result}`);
         return res.status(403).send('禁止：' + result);
     }
-    
+
     // 检查文件名是否合法
     let filenameResult = filter.checkImageFilename(filename);
     if (filenameResult !== 'ok') {
         console.log(`恶意删除尝试 - filename: ${filename}, 原因: ${filenameResult}`);
         return res.status(403).send('禁止：' + filenameResult);
     }
-    
+
     const folderPath = path.join(__dirname, 'public', 'images', boxname);
     const filePath = path.join(folderPath, filename);
 
@@ -199,14 +209,14 @@ app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
 // 删除imagebox
 app.post('/api/clearBox/:boxname', (req, res) => {
     const boxname = req.params.boxname;
-    
+
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);
     if (result !== 'ok') {
         console.log(`恶意清空尝试 - boxname: ${boxname}, 原因: ${result}`);
         return res.status(403).send('禁止：' + result);
     }
-    
+
     const folderPath = path.join(__dirname, 'public', 'images', boxname);
 
     // 检查文件夹是否存在
@@ -251,17 +261,17 @@ app.use((error, req, res, next) => {
         }
         return res.status(400).send('文件上传错误: ' + error.message);
     }
-    
+
     // 处理自定义验证错误（恶意上传）
     if (error.message) {
         console.log(`恶意上传被拦截: ${error.message}`);
         return res.status(403).send('禁止：' + error.message);
     }
-    
+
     next(error);
 });
 
 // 启动服务器
-app.listen(port,() => {
-  console.log(`Server is running on port ${port}`);
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });

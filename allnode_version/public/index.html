@@ -18,7 +18,7 @@
     <meta name="apple-mobile-web-app-title" content="Cliper">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <title>Web Pasteboard</title>
     <style>
         /* 全屏按钮样式 */
@@ -52,11 +52,13 @@
         .fullscreen-btn.dark-mode:hover {
             background-color: #666;
         }
+
         /* 按钮容器纵向排列 */
         .button-row {
             display: contents;
             justify-content: center;
         }
+
         /* 在小屏幕下隐藏全屏按钮 */
         @media (max-width: 1200px) {
             .fullscreen-btn {
@@ -156,20 +158,24 @@
             display: flex;
             flex-direction: row;
         }
+
         /* for ipadmini  */
 
         @media (max-width: 1200px) {
             .bigflexbox {
                 overflow: hidden;
             }
+
             .buttons-box {
                 width: 25%;
                 display: flex;
             }
+
             textarea {
                 height: 55vh;
             }
         }
+
         /* Media query for screens smaller than 600px */
         /* for phones  */
         @media (max-width: 600px) {
@@ -228,20 +234,46 @@
                 position: absolute;
             }
 
-            #saveFile::before { content: "\f0ee"; color: #666;} /* fa-cloud-upload */
-            #loadFile::before { content: "\f019"; color: #666;} /* fa-download */
-            #CopyAll::before { content: "\f0c5"; color: #666;}
-            #Share::before { content: "\f1e0"; color: #666;}
-            #images::before { content: "\f03e"; color: #666;}
-            #toggleMode::before { content: "\f186"; color: #666;}
+            #saveFile::before {
+                content: "\f0ee";
+                color: #666;
+            }
+
+            /* fa-cloud-upload */
+            #loadFile::before {
+                content: "\f019";
+                color: #666;
+            }
+
+            /* fa-download */
+            #CopyAll::before {
+                content: "\f0c5";
+                color: #666;
+            }
+
+            #Share::before {
+                content: "\f1e0";
+                color: #666;
+            }
+
+            #images::before {
+                content: "\f03e";
+                color: #666;
+            }
+
+            #toggleMode::before {
+                content: "\f186";
+                color: #666;
+            }
 
         }
+
         /* buttons */
         button {
             margin-top: 8px;
             border: transparent solid 1px;
             background-color: transparent;
-            /* display: list-item; fix firefox problem*/ 
+            /* display: list-item; fix firefox problem*/
             color: #666;
         }
 
@@ -485,30 +517,30 @@
 
         // Keyboard event listener 
         document.addEventListener('keydown', function (event) {
-            if ((event.ctrlKey||event.metaKey) && event.key === 'b') {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
                 event.preventDefault();
                 toggleDarkMode();
             }
-            if ((event.ctrlKey||event.metaKey) && event.key === 's') {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
                 event.preventDefault();
                 saveButton.click();
             }
-            if ((event.ctrlKey||event.metaKey) && event.key === 'l') {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'l') {
                 event.preventDefault();
                 loadButton.click();
             }
-            if (event.key === 'F11' || 
-            ((event.ctrlKey||event.metaKey) && event.key === 'm')) {
+            if (event.key === 'F11' ||
+                ((event.ctrlKey || event.metaKey) && event.key === 'm')) {
                 event.preventDefault();
                 toggleBigMode();
             }
             //savebutton
-            if ((event.ctrlKey||event.metaKey) && event.shiftKey && event.key === 'C') {
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'C') {
                 event.preventDefault();
                 CopyAll();
             }
             //sharebutton
-            if ((event.ctrlKey||event.metaKey) && event.shiftKey && event.key === 'S') {
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'S') {
                 event.preventDefault();
                 Share();
             }
@@ -650,7 +682,7 @@
 
         // 全屏按钮功能
         const fullscreenBtn = document.getElementById('fullscreenBtn');
-        fullscreenBtn.addEventListener('click', function() {
+        fullscreenBtn.addEventListener('click', function () {
             toggleBigMode();
         });
     </script>
