@@ -23,6 +23,48 @@ app.use(express.static(path.join(__dirname, 'public'), {
     }
 }));
 
+// 密码验证函数
+function verifyPassword(boxname, providedPassword) {
+    const passwordFile = path.join(__dirname, 'public', 'images', boxname, 'password.txt');
+    if (fs.existsSync(passwordFile)) {
+        const storedPassword = fs.readFileSync(passwordFile, 'utf8').trim();
+        return storedPassword === providedPassword;
+    }
+    return true; // 如果没有密码文件，默认不需要密码
+}
+
+// 检查是否设置了密码
+app.get('/api/hasPassword/:boxname', (req, res) => {
+    const boxname = req.params.boxname;
+    const passwordFile = path.join(__dirname, 'public', 'images', boxname, 'password.txt');
+    res.send({ hasPassword: fs.existsSync(passwordFile) });
+});
+
+// 设置/修改密码
+app.post('/api/setPassword/:boxname', express.json(), (req, res) => {
+    const boxname = req.params.boxname;
+    const { oldPassword, newPassword } = req.body;
+    const folderPath = path.join(__dirname, 'public', 'images', boxname);
+    const passwordFile = path.join(folderPath, 'password.txt');
+
+    if (filter.checkimageboxname(boxname) !== 'ok') return res.status(403).send('非法名称');
+
+    if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+
+    if (fs.existsSync(passwordFile)) {
+        const storedPassword = fs.readFileSync(passwordFile, 'utf8').trim();
+        if (storedPassword !== oldPassword) return res.status(401).send('原密码错误');
+    }
+
+    if (!newPassword || newPassword.trim() === '') {
+        if (fs.existsSync(passwordFile)) fs.unlinkSync(passwordFile);
+        res.send('Password removed');
+    } else {
+        fs.writeFileSync(passwordFile, newPassword.trim());
+        res.send('Password set');
+    }
+});
+
 // 定义路由
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -91,8 +133,10 @@ app.get('/api/getImageList/:boxname', (req, res) => {
                     console.error(`读取文件夹错误: ${err.message}`);
                     res.status(500).send('Internal Server Error');
                 } else {
-                    console.log(`文件夹 ${folderPath} 中的文件:`, files);
-                    res.send(files);
+                    // 过滤掉密码文件
+                    const filteredFiles = files.filter(f => f !== 'password.txt');
+                    console.log(`文件夹 ${folderPath} 中的文件:`, filteredFiles);
+                    res.send(filteredFiles);
                 }
             });
         } else {
@@ -140,7 +184,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
+app.post('/api/uploadImage/:boxname', (req, res, next) => {
+    const boxname = req.params.boxname;
+    const password = req.headers['x-box-password'];
+    if (!verifyPassword(boxname, password)) {
+        return res.status(401).send('密码错误或需要密码');
+    }
+    next();
+}, upload.array('image', 10), (req, res) => {
     const boxname = req.params.boxname;
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);
@@ -173,6 +224,11 @@ app.post('/api/uploadImage/:boxname', upload.array('image', 10), (req, res) => {
 app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
     const boxname = req.params.boxname;
     const filename = req.params.filename;
+    const password = req.headers['x-box-password'];
+
+    if (!verifyPassword(boxname, password)) {
+        return res.status(401).send('密码错误');
+    }
 
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);
@@ -209,6 +265,11 @@ app.post('/api/deleteImage/:boxname/:filename', (req, res) => {
 // 删除imagebox
 app.post('/api/clearBox/:boxname', (req, res) => {
     const boxname = req.params.boxname;
+    const password = req.headers['x-box-password'];
+
+    if (!verifyPassword(boxname, password)) {
+        return res.status(401).send('密码错误');
+    }
 
     // 检查boxname是否合法
     let result = filter.checkimageboxname(boxname);

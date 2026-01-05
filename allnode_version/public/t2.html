@@ -291,12 +291,14 @@
     }
 
     .toggle-container {
-        float: right;
+        float: left;
         display: flex;
         align-items: center;
         margin: 5px;
         font-size: 13px;
-        color: #aaa;
+        color: #000;
+        /* Using black for better visibility */
+        font-weight: bold;
         gap: 8px;
     }
 
@@ -342,6 +344,10 @@
         background-color: #34c759;
     }
 
+    #quickDelete:checked+.slider {
+        background-color: #ff3b30;
+    }
+
     input:focus+.slider {
         box-shadow: 0 0 1px #34c759;
     }
@@ -349,10 +355,239 @@
     input:checked+.slider:before {
         transform: translateX(14px);
     }
+
+    /* 密码模态框 */
+    .pwd-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pwd-content {
+        background-color: #222;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #444;
+        width: 300px;
+        text-align: center;
+    }
+
+    .pwd-content input {
+        width: 100%;
+        padding: 10px;
+        margin: 15px 0;
+        background: #000;
+        border: 1px solid #555;
+        color: #fff;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .pwd-btns {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .pwd-btn {
+        flex: 1;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 5px;
+        border: none;
+    }
+
+    .pwd-ok {
+        background: #34c759;
+        color: white;
+    }
+
+    .pwd-cancel {
+        background: #444;
+        color: white;
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(14px);
+    }
+
+    /* 统一模态框基础样式 */
+    .generic-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-box {
+        background-color: #1e1e1e;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #333;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-box h3 {
+        margin-top: 0;
+        color: #fff;
+    }
+
+    .modal-box p {
+        color: #aaa;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .modal-box input {
+        width: 100%;
+        padding: 12px;
+        margin: 16px 0;
+        background: #000;
+        border: 1px solid #444;
+        color: #fff;
+        border-radius: 6px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    .modal-box input:focus {
+        border-color: #34c759;
+    }
+
+    .modal-btn-group {
+        display: flex;
+        justify-content: gap;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .m-btn {
+        flex: 1;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 6px;
+        border: none;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .close-x {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        color: #777;
+        font-size: 24px;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .close-x:hover {
+        color: #fff;
+    }
+
+    .m-btn-ok {
+        background: #34c759;
+        color: white;
+    }
+
+    .m-btn-ok:hover {
+        background: #2eb04f;
+    }
+
+    .m-btn-cancel {
+        background: #333;
+        color: #eee;
+    }
+
+    .m-btn-cancel:hover {
+        background: #444;
+    }
+
+    .m-btn-danger {
+        background: #ff3b30;
+        color: white;
+    }
+
+    .m-btn-danger:hover {
+        background: #e0352b;
+    }
+
+    /* Toast 样式 */
+    #toast-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3000;
+        pointer-events: none;
+    }
+
+    .toast {
+        background: rgba(52, 199, 89, 0.9);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        font-weight: bold;
+        animation: toast-in 0.3s ease-out, toast-out 0.3s ease-in 2s forwards;
+    }
+
+    .toast.error {
+        background: rgba(255, 59, 48, 0.9);
+    }
+
+    @keyframes toast-in {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes toast-out {
+        from {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        to {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+    }
 </style>
 
 <body>
-    <input class="btn" type="text" id="boxname" onkeydown="handleKeyDown(event)" placeholder="image box-name">
+    <!-- Top Right Box Selection Area -->
+    <div style="position: fixed; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 1000; align-items: center;">
+        <input class="btn" type="text" id="boxname" onkeydown="handleKeyDown(event)" placeholder="Box Name"
+            style="float: none; margin: 0; width: 120px; background: rgba(0,0,0,0.7); border: 1px solid #555;">
+        <button class="btn" onclick="refreshImageList()"
+            style="float: none; margin: 0; background-color: #34c759; color: white; border: none; font-weight: bold; border-radius: 4px; padding: 6px 15px;">Go</button>
+    </div>
 
     <a class="btn" style="color: rgb(255, 255, 255); float: left; border: none;" href='index.html'>
         < Back</a>
@@ -364,12 +599,21 @@
                 style="color: rgb(248, 140, 140);"><b>clear</b></button>
             <button id="reloadimages" class="btn" onclick="refreshImageList()"> <b>reload</b></button>
             <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
-            <div class="toggle-container">
+            <button id="permissionBtn" class="btn" onclick="managePermission()"
+                style="color: #ffd700;"><b>Permission</b></button>
+            <div class="toggle-container" style="display:inline-block; margin-right: 15px;">
                 <label class="switch">
                     <input type="checkbox" id="autoCompress" onchange="saveCompressState()">
                     <span class="slider"></span>
                 </label>
-                <label for="autoCompress">Auto Compress</label>
+                <label for="autoCompress" style="color: black; font-weight: bold;">Auto Compress</label>
+            </div>
+            <div class="toggle-container" style="display:inline-block;">
+                <label class="switch">
+                    <input type="checkbox" id="quickDelete" onchange="saveQuickDeleteState()">
+                    <span class="slider"></span>
+                </label>
+                <label for="quickDelete" style="color: black; font-weight: bold;">Quick Delete</label>
             </div>
             <div id="panel" class="panel">
 
@@ -386,7 +630,53 @@
                 </div>
             </div>
 
-            <!-- 添加模态窗口 -->
+            <!-- 统一权限管理窗口 -->
+            <div id="permModal" class="generic-modal">
+                <div class="modal-box" style="position: relative;">
+                    <span class="close-x" onclick="closePermModal()">&times;</span>
+                    <h3>Box Permission</h3>
+                    <p id="permStatusDesc" style="margin-bottom: 20px;"></p>
+
+                    <div id="permFields">
+                        <div id="oldPwdWrap">
+                            <input type="password" id="permOldPwd" placeholder="Current Password">
+                        </div>
+                        <input type="password" id="permNewPwd" placeholder="New Password">
+                        <div class="modal-btn-group">
+                            <button class="m-btn m-btn-ok" id="permSubmitBtn">Update</button>
+                            <button class="m-btn m-btn-danger" id="permRemoveBtn" style="display:none;"
+                                onclick="handleRemoveProtection()">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 密码模态窗口 (仅用于操作时的即时校验) -->
+            <div id="pwdModal" class="generic-modal">
+                <div class="modal-box" style="position: relative;">
+                    <span class="close-x" onclick="closePwdModal()">&times;</span>
+                    <h3 id="pwdTitle">Password Required</h3>
+                    <p id="pwdDesc"></p>
+                    <input type="password" id="pwdInput" placeholder="Enter password...">
+                    <div class="modal-btn-group">
+                        <button class="m-btn m-btn-ok" id="pwdSubmit" style="width: 100%;">Confirm</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 确认模态窗口 -->
+            <div id="confirmModal" class="generic-modal">
+                <div class="modal-box">
+                    <h3 id="confirmTitle">Are you sure?</h3>
+                    <p id="confirmDesc"></p>
+                    <div class="modal-btn-group">
+                        <button class="m-btn m-btn-cancel" id="confirmCancel">Cancel</button>
+                        <button class="m-btn m-btn-ok" id="confirmOk">OK</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片预览模态窗口 -->
             <div id="imageModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal">&times;</span>
@@ -398,6 +688,8 @@
                     </div>
                 </div>
             </div>
+
+            <div id="toast-container"></div>
 </body>
 
 </html>
@@ -406,7 +698,7 @@
 
 
     function showImage(url) {
-        location.href = url
+        // This will be handled by the specialized showImage function below
     }
 
     var isPanelOpened = false
@@ -422,9 +714,9 @@
     function handleDrop(event) {
         event.preventDefault();
         var file = event.dataTransfer.files[0];
-        alert("File dropped: " + file.name);
-        // 在这里进行文件处理或上传的相关操作
-        console.log(file);
+        if (file) {
+            showToast("File dropped: " + file.name);
+        }
     }
 
     function loadEmojiIcon(curEmoji) {
@@ -553,61 +845,76 @@
 
 
 
-    function deleteImageByUrl(url) {
-        var x = confirm("Delete this image?");
-        if (x) {
-            var imageWrapper = document.getElementById(url);
-            if (imageWrapper) {
-                imageWrapper.remove();
-            }
+    async function deleteImageByUrl(url) {
+        const skipConfirm = document.getElementById('quickDelete').checked;
+        let confirmed = true;
+        if (!skipConfirm) {
+            confirmed = await openConfirmModal("Delete Image", "This action cannot be undone. Are you sure?");
+        }
 
-            // 获取 boxname 和 filename
+        if (confirmed) {
             var boxname = getboxname();
-            var filename = url
+            var filename = url;
+            async function tryDelete() {
+                var password = getSavedPassword(boxname);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/deleteImage/' + boxname + '/' + filename, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                if (password) xhr.setRequestHeader('x-box-password', password);
 
-            // 创建 XMLHttpRequest 对象
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '/api/deleteImage/' + boxname + '/' + filename, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        console.log('Image deleted successfully');
-                    } else {
-                        console.error('Error deleting image');
+                xhr.onreadystatechange = async function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            showToast("Deleted successfully");
+                            var imageWrapper = document.getElementById(url);
+                            if (imageWrapper) imageWrapper.remove();
+                        } else if (xhr.status === 401) {
+                            const newPwd = await openPwdModal("Auth Failed", "Enter correct password for this box:");
+                            if (newPwd !== null) {
+                                savePassword(boxname, newPwd);
+                                tryDelete();
+                            }
+                        } else {
+                            showToast('Error: ' + xhr.responseText, true);
+                        }
                     }
-                }
-            };
-
-            // 发送请求
-            xhr.send();
+                };
+                xhr.send();
+            }
+            tryDelete();
         }
     }
-    function clearbox() {
-        var x = confirm("Clear this box?"); // 显示确认框
 
-        if (x) {
-            // 发送请求到后端
-            var xhr = new XMLHttpRequest();
+    async function clearbox() {
+        const confirmed = await openConfirmModal("Clear Box", "This will delete ALL images in current box. Continue?");
+        if (confirmed) {
             var boxname = getboxname();
-            xhr.open('POST', '/api/clearBox/' + boxname, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
+            async function tryClear() {
+                var password = getSavedPassword(boxname);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/clearBox/' + boxname, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                if (password) xhr.setRequestHeader('x-box-password', password);
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        console.log('Box cleared successfully');
-                        //reload this page
-                        location.reload();
-                    } else {
-                        console.error('Error clearing the box');
-                        // 处理错误情况，例如显示错误消息给用户
+                xhr.onreadystatechange = async function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            showToast("Box cleared");
+                            setTimeout(() => location.reload(), 1000);
+                        } else if (xhr.status === 401) {
+                            const newPwd = await openPwdModal("Auth Failed", "Enter correct password for this box:");
+                            if (newPwd !== null) {
+                                savePassword(boxname, newPwd);
+                                tryClear();
+                            }
+                        } else {
+                            showToast('Error: ' + xhr.responseText, true);
+                        }
                     }
-                }
-            };
-
-            xhr.send();
+                };
+                xhr.send();
+            }
+            tryClear();
         }
     }
 
@@ -756,19 +1063,188 @@
     }
 
     // 执行图片上传请求
-    function uploadImages(formData) {
-        // 获取 boxname
+    async function uploadImages(formData) {
         var boxname = getboxname();
-        return fetch('/api/uploadImage/' + boxname, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP 错误！状态: ${response.status}`);
-                }
-                return response.text();
+        async function tryUpload() {
+            var password = getSavedPassword(boxname);
+            const response = await fetch('/api/uploadImage/' + boxname, {
+                method: 'POST',
+                body: formData,
+                headers: password ? { 'x-box-password': password } : {}
             });
+
+            if (response.status === 401) {
+                const newPwd = await openPwdModal("Auth Failed", "Enter correct password for this box:");
+                if (newPwd !== null) {
+                    savePassword(boxname, newPwd);
+                    return await tryUpload();
+                }
+                throw new Error('Unauthorized');
+            }
+            if (!response.ok) {
+                const text = await response.text();
+                showToast("Upload failed: " + text, true);
+                throw new Error(text || `HTTP 错误！状态: ${response.status}`);
+            }
+            showToast("Upload success!");
+            return response.text();
+        }
+        return await tryUpload();
+    }
+
+    // --- 权限管理相关函数 ---
+
+    function getSavedPassword(boxname) {
+        return localStorage.getItem('box-password-' + boxname);
+    }
+
+    function savePassword(boxname, pwd) {
+        localStorage.setItem('box-password-' + boxname, pwd);
+    }
+
+    let pwdResolve = null;
+    function openPwdModal(title, desc = "") {
+        document.getElementById('pwdTitle').innerText = title;
+        document.getElementById('pwdDesc').innerText = desc;
+        document.getElementById('pwdInput').value = "";
+        document.getElementById('pwdModal').style.display = 'flex';
+        document.getElementById('pwdInput').focus();
+        return new Promise((resolve) => {
+            pwdResolve = resolve;
+        });
+    }
+
+    function closePwdModal() {
+        document.getElementById('pwdModal').style.display = 'none';
+        if (pwdResolve) pwdResolve(null);
+    }
+
+    function closePermModal() {
+        document.getElementById('permModal').style.display = 'none';
+    }
+
+    document.getElementById('pwdSubmit').onclick = function () {
+        const val = document.getElementById('pwdInput').value;
+        document.getElementById('pwdModal').style.display = 'none';
+        if (pwdResolve) pwdResolve(val);
+    };
+
+    document.getElementById('pwdInput').onkeydown = function (e) {
+        if (e.key === 'Enter') document.getElementById('pwdSubmit').click();
+    };
+
+    let confirmResolve = null;
+    function openConfirmModal(title, desc = "") {
+        document.getElementById('confirmTitle').innerText = title;
+        document.getElementById('confirmDesc').innerText = desc;
+        document.getElementById('confirmModal').style.display = 'flex';
+        return new Promise((resolve) => {
+            confirmResolve = resolve;
+        });
+    }
+
+    document.getElementById('confirmOk').onclick = function () {
+        document.getElementById('confirmModal').style.display = 'none';
+        if (confirmResolve) confirmResolve(true);
+    };
+
+    document.getElementById('confirmCancel').onclick = function () {
+        document.getElementById('confirmModal').style.display = 'none';
+        if (confirmResolve) confirmResolve(false);
+    };
+
+    function showToast(msg, isError = false) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast' + (isError ? ' error' : '');
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+
+
+    async function managePermission() {
+        const boxname = getboxname();
+        const hasPwdRes = await fetch('/api/hasPassword/' + boxname);
+        const { hasPassword } = await hasPwdRes.json();
+
+        const statusDesc = document.getElementById('permStatusDesc');
+        const oldPwdWrap = document.getElementById('oldPwdWrap');
+        const removeBtn = document.getElementById('permRemoveBtn');
+        const submitBtn = document.getElementById('permSubmitBtn');
+        const newPwdInput = document.getElementById('permNewPwd');
+        const oldPwdInput = document.getElementById('permOldPwd');
+
+        const savedPwd = getSavedPassword(boxname);
+        oldPwdInput.value = savedPwd || "";
+        newPwdInput.value = "";
+
+        if (hasPassword) {
+            statusDesc.innerHTML = `<span style="color:#34c759; font-size:18px; font-weight:bold;">Protected</span><br><small style="color:#666">Server file: images/${boxname}/password.txt</small>`;
+            oldPwdWrap.style.display = "block";
+            removeBtn.style.display = "block";
+            submitBtn.innerText = "Update Password";
+            newPwdInput.placeholder = "New Password";
+        } else {
+            statusDesc.innerHTML = `<span style="color:#888; font-size:18px; font-weight:bold;">No Protection</span>`;
+            oldPwdWrap.style.display = "none";
+            removeBtn.style.display = "none";
+            submitBtn.innerText = "Enable Protection";
+            newPwdInput.placeholder = "Set Password";
+        }
+
+        submitBtn.onclick = async () => {
+            const oldPassword = oldPwdInput.value;
+            const newPassword = newPwdInput.value;
+            if (!hasPassword && !newPassword) {
+                showToast("Please enter a password", true);
+                return;
+            }
+            const res = await fetch('/api/setPassword/' + boxname, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ oldPassword, newPassword })
+            });
+            if (res.ok) {
+                showToast("Success!");
+                if (newPassword) savePassword(boxname, newPassword);
+                else savePassword(boxname, ""); // Handle removal
+                closePermModal();
+            } else {
+                showToast("Failed: " + await res.text(), true);
+            }
+        };
+
+        const handleEnter = (e) => {
+            if (e.key === 'Enter') submitBtn.click();
+        };
+        oldPwdInput.onkeydown = handleEnter;
+        newPwdInput.onkeydown = handleEnter;
+
+        document.getElementById('permModal').style.display = 'flex';
+    }
+
+    async function handleRemoveProtection() {
+        const boxname = getboxname();
+        const oldPassword = document.getElementById('permOldPwd').value;
+        if (!oldPassword) {
+            showToast("Enter current password to disable", true);
+            return;
+        }
+        const confirmed = await openConfirmModal("Disable Protection", "Are you sure you want to remove password for this box?");
+        if (!confirmed) return;
+        const res = await fetch('/api/setPassword/' + boxname, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ oldPassword, newPassword: "" })
+        });
+        if (res.ok) {
+            showToast("Protection Removed");
+            savePassword(boxname, "");
+            closePermModal();
+        } else {
+            showToast("Failed: " + await res.text(), true);
+        }
     }
 
     // 监听回车键(TEXT INPUT )
@@ -804,7 +1280,19 @@
         localStorage.setItem('auto-compress-enabled', isEnabled);
     }
 
+    function loadQuickDeleteState() {
+        const savedState = localStorage.getItem('quick-delete-enabled');
+        const qdToggle = document.getElementById('quickDelete');
+        qdToggle.checked = savedState === 'true';
+    }
+
+    function saveQuickDeleteState() {
+        const isEnabled = document.getElementById('quickDelete').checked;
+        localStorage.setItem('quick-delete-enabled', isEnabled);
+    }
+
     loadCompressState();
+    loadQuickDeleteState();
     loadEmojiIcon('🏞️')
     refreshImageList()
     //wait .5s
