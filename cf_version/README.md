@@ -59,7 +59,7 @@ npx wrangler r2 object put webclipboard-storage/public/icon.png --file=../allnod
 
 # 使用
 **部署成功后的访问地址：**
-[https://webclipboard-cf.<username>.workers.dev](https://webclipboard-cf.<username>.workers.dev)
+[https://webclipboard-cf.yourusername.workers.dev](https://webclipboard-cf.yourusername.workers.dev)
 
 同时推荐使用我的另一个项目：[ahkshortcut](https://github.com/cornradio/ahkshortcut) ,它可以使用快捷键打开自定义链接。
 
