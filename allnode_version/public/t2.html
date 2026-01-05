@@ -601,6 +601,8 @@
             <button id="opencloseBtn" class="btn" onclick="openClosePanel()"> <b>images</b></button>
             <button id="permissionBtn" class="btn" onclick="managePermission()"
                 style="color: #ffd700;"><b>Permission</b></button>
+            <button id="whitelistBtn" class="btn" onclick="manageWhitelist()" style="color: #00ffff;"><b>Use
+                    Scope</b></button>
             <div class="toggle-container" style="display:inline-block; margin-right: 15px;">
                 <label class="switch">
                     <input type="checkbox" id="autoCompress" onchange="saveCompressState()">
@@ -641,6 +643,18 @@
                         <div id="oldPwdWrap">
                             <input type="password" id="permOldPwd" placeholder="Current Password">
                         </div>
+
+                        <!-- 授权区域：仅在系统已锁定时显示 -->
+                        <div id="authWrap"
+                            style="display:none; border: 1px dashed #ff3b30; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                            <p style="color: #ff3b30; font-size: 11px; margin-top: 0;">Authorization Required: System is
+                                locked.</p>
+                            <input type="text" id="permAuthBox" placeholder="An authorized Box Name"
+                                style="margin: 5px 0;">
+                            <input type="password" id="permAuthPwd" placeholder="That Box's Password"
+                                style="margin: 5px 0;">
+                        </div>
+
                         <input type="password" id="permNewPwd" placeholder="New Password">
                         <div class="modal-btn-group">
                             <button class="m-btn m-btn-ok" id="permSubmitBtn">Update</button>
@@ -672,6 +686,33 @@
                     <div class="modal-btn-group">
                         <button class="m-btn m-btn-cancel" id="confirmCancel">Cancel</button>
                         <button class="m-btn m-btn-ok" id="confirmOk">OK</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 使用范围 (白名单) 模态窗口 -->
+            <div id="whitelistModal" class="generic-modal">
+                <div class="modal-box" style="width: 400px;">
+                    <span class="close-x" onclick="closeWhitelistModal()">&times;</span>
+                    <h3>Use Scope (Hotlink Protection)</h3>
+                    <p style="text-align: left; font-size: 12px; margin-bottom: 10px;">
+                        Enable this to only allow specific domains to load your images. One domain per line (e.g.,
+                        <code>https://blog.com</code>).
+                    </p>
+                    <div
+                        style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px;">
+                        <label class="switch">
+                            <input type="checkbox" id="whitelistEnabled">
+                            <span class="slider"></span>
+                        </label>
+                        <span style="color: #fff; font-weight: bold;">Enable Whitelist</span>
+                    </div>
+                    <textarea id="whitelistContent"
+                        style="width: 100%; height: 150px; background: #000; border: 1px solid #444; color: #fff; border-radius: 6px; padding: 10px; box-sizing: border-box; font-family: monospace; outline: none; margin-bottom: 15px;"
+                        placeholder="https://mysite.com&#10;https://another.org"></textarea>
+                    <div class="modal-btn-group">
+                        <button class="m-btn m-btn-ok" id="whitelistSubmitBtn" onclick="saveWhitelist()">Save
+                            Settings</button>
                     </div>
                 </div>
             </div>
@@ -1165,23 +1206,35 @@
 
     async function managePermission() {
         const boxname = getboxname();
-        const hasPwdRes = await fetch('/api/hasPassword/' + boxname);
+
+        // 并行检查本 box 状态和全系统状态
+        const [hasPwdRes, systemStatusRes] = await Promise.all([
+            fetch('/api/hasPassword/' + boxname),
+            fetch('/api/systemStatus')
+        ]);
         const { hasPassword } = await hasPwdRes.json();
+        const { isSystemProtected } = await systemStatusRes.json();
 
         const statusDesc = document.getElementById('permStatusDesc');
         const oldPwdWrap = document.getElementById('oldPwdWrap');
+        const authWrap = document.getElementById('authWrap');
         const removeBtn = document.getElementById('permRemoveBtn');
         const submitBtn = document.getElementById('permSubmitBtn');
         const newPwdInput = document.getElementById('permNewPwd');
         const oldPwdInput = document.getElementById('permOldPwd');
+        const authBoxInput = document.getElementById('permAuthBox');
+        const authPwdInput = document.getElementById('permAuthPwd');
 
         const savedPwd = getSavedPassword(boxname);
         oldPwdInput.value = savedPwd || "";
         newPwdInput.value = "";
+        authBoxInput.value = "";
+        authPwdInput.value = "";
 
         if (hasPassword) {
-            statusDesc.innerHTML = `<span style="color:#34c759; font-size:18px; font-weight:bold;">Protected</span><br><small style="color:#666">Server file: images/${boxname}/password.txt</small>`;
+            statusDesc.innerHTML = `<span style="color:#34c759; font-size:18px; font-weight:bold;">Protected</span>`;
             oldPwdWrap.style.display = "block";
+            authWrap.style.display = "none";
             removeBtn.style.display = "block";
             submitBtn.innerText = "Update Password";
             newPwdInput.placeholder = "New Password";
@@ -1191,19 +1244,34 @@
             removeBtn.style.display = "none";
             submitBtn.innerText = "Enable Protection";
             newPwdInput.placeholder = "Set Password";
+
+            // 如果系统已锁定，且当前 Box 没密码，则必须显示授权框
+            if (isSystemProtected) {
+                authWrap.style.display = "block";
+            } else {
+                authWrap.style.display = "none";
+            }
         }
 
         submitBtn.onclick = async () => {
             const oldPassword = oldPwdInput.value;
             const newPassword = newPwdInput.value;
+            const authBoxName = authBoxInput.value;
+            const authPassword = authPwdInput.value;
+
             if (!hasPassword && !newPassword) {
                 showToast("Please enter a password", true);
                 return;
             }
+            if (!hasPassword && isSystemProtected && (!authBoxName || !authPassword)) {
+                showToast("Please provide Auth Box and Password", true);
+                return;
+            }
+
             const res = await fetch('/api/setPassword/' + boxname, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ oldPassword, newPassword })
+                body: JSON.stringify({ oldPassword, newPassword, authBoxName, authPassword })
             });
             if (res.ok) {
                 showToast("Success!");
@@ -1245,6 +1313,84 @@
         } else {
             showToast("Failed: " + await res.text(), true);
         }
+    }
+
+    // --- 白名单 (防盗链) 管理 ---
+
+    async function manageWhitelist() {
+        const boxname = getboxname();
+        async function tryFetch() {
+            const password = getSavedPassword(boxname);
+            const res = await fetch('/api/getWhitelist/' + boxname, {
+                headers: password ? { 'x-box-password': password } : {}
+            });
+
+            if (res.status === 401) {
+                const newPwd = await openPwdModal("Auth Failed", "Enter password for this box to manage settings:");
+                if (newPwd !== null) {
+                    savePassword(boxname, newPwd);
+                    return tryFetch();
+                }
+                return;
+            }
+
+            if (res.ok) {
+                const { content, enabled } = await res.json();
+                document.getElementById('whitelistContent').value = content;
+                document.getElementById('whitelistEnabled').checked = enabled;
+                document.getElementById('whitelistModal').style.display = 'flex';
+            } else {
+                showToast("Failed to fetch: " + await res.text(), true);
+            }
+        }
+        tryFetch();
+    }
+
+    function closeWhitelistModal() {
+        document.getElementById('whitelistModal').style.display = 'none';
+    }
+
+    async function saveWhitelist() {
+        const boxname = getboxname();
+        const content = document.getElementById('whitelistContent').value;
+        const enabled = document.getElementById('whitelistEnabled').checked;
+        const btn = document.getElementById('whitelistSubmitBtn');
+
+        async function trySave() {
+            const password = getSavedPassword(boxname);
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/setWhitelist/' + boxname, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(password ? { 'x-box-password': password } : {})
+                    },
+                    body: JSON.stringify({ content, enabled })
+                });
+
+                if (res.status === 401) {
+                    const newPwd = await openPwdModal("Auth Failed", "Enter password for this box to save:");
+                    if (newPwd !== null) {
+                        savePassword(boxname, newPwd);
+                        return trySave();
+                    }
+                } else if (res.ok) {
+                    showToast("Whitelist updated!");
+                    closeWhitelistModal();
+                } else {
+                    showToast("Save failed: " + await res.text(), true);
+                }
+            } catch (e) {
+                showToast("Network error", true);
+            } finally {
+                btn.innerText = "Save Settings";
+                btn.disabled = false;
+            }
+        }
+        trySave();
     }
 
     // 监听回车键(TEXT INPUT )

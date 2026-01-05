@@ -1,0 +1,12 @@
+name = "webclipboard-cf"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# 绑定 R2 存储桶，你需要在 CF 后台创建一个名为 'webclipboard-storage' 的桶
+# 然后在命令行运行 npx wrangler r2 bucket create webclipboard-storage
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "webclipboard-storage"
+
+[observability]
+enabled = true

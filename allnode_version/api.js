@@ -10,12 +10,28 @@ const port = 3000;
 const filemanager = require('./filemanager');
 const filter = require('./filter');
 
+// 中间件：记录对图片的请求，方便调试图床问题
+app.use('/images', (req, res, next) => {
+    const time = new Date().toLocaleString();
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const referer = req.headers['referer'] || 'no referer';
+    console.log(`[${time}] Image request: ${req.url} | from IP: ${ip} | Referer: ${referer}`);
+    next();
+});
+
 // 设置静态文件目录，并允许跨域（CORS）以及设置缓存，方便作为图床使用
 app.use(express.static(path.join(__dirname, 'public'), {
     setHeaders: (res, path) => {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
         res.set('Timing-Allow-Origin', '*');
+        // 允许跨域加载资源，这对于图床非常重要
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+        // 设置引用来源策略，防止由引用来源引起的各种限制
+        res.set('Referrer-Policy', 'no-referrer');
+        // 防止浏览器猜测类型
+        res.set('X-Content-Type-Options', 'nosniff');
+
         // 为图片设置长期缓存
         if (path.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
             res.set('Cache-Control', 'public, max-age=31536000');
