@@ -1,11 +1,20 @@
 # WebClipboard Cloudflare Workers 版本
 
-这个版本将你的应用迁移到了 Cloudflare 生态系统，完美解决了国内服务器没备案导致的 HTTPS/SSL 证书问题。
+使用Cloudflare部署可以使用它免费的R2额度，以及worker能力，完成无服务器图床搭建。  
+这个版本和主线版本不同，它优化了图床能力以及相关的权限控制。
+
+- [部署](#部署)
+- [使用](#使用)
+
 
 ## 优势
 - **HTTPS**: 自动拥有域名和 SSL 证书。
 - **免维护**: 不需要服务器，不需要控制容器。
-- **图床优化**: 已经内置了 Referrer 策略和跨域策略。
+- **图床优化**: 已经内置了 Referrer 策略和跨域策略、以及更多的权限控制。
+
+
+# 部署
+嗯你需要首先下载本项目，然后参考下列步骤进行部署。
 
 ## 准备工作
 1. 登录 [Cloudflare 控制台](https://dash.cloudflare.com/)。
@@ -18,9 +27,6 @@
 3. 登录 CF：`npx wrangler login`
 4. 部署：`npx wrangler deploy`
 
-## 你的专属网址
-**部署成功后的访问地址：**
-[https://webclipboard-cf.kasusaland.workers.dev](https://webclipboard-cf.kasusaland.workers.dev)
 
 ---
 
@@ -51,22 +57,34 @@ npx wrangler r2 object put webclipboard-storage/public/icon.png --file=../allnod
 
 ---
 
-## 注意事项
-- 你在 R2 创建的桶名字必须叫 `webclipboard-storage`。
-- 只有上传了 `public/index.html` 之后，访问上面的网址才能看到界面。
+# 使用
+**部署成功后的访问地址：**
+[https://webclipboard-cf.<username>.workers.dev](https://webclipboard-cf.<username>.workers.dev)
 
----
+同时推荐使用我的另一个项目：[ahkshortcut](https://github.com/cornradio/ahkshortcut) ,它可以使用快捷键打开自定义链接。
 
-## 🤓 技术原理 (为什么这个方案更牛？)
+## 使用
 
-### 1. 强制 HTTPS 同化 (解决 Mixed Content)
-- **以前**：你的服务器是 HTTP (88端口)，目标展示页是 HTTPS。浏览器为了安全，禁止在 HTTPS 页面加载内容。
-- **现在**：Cloudflare 为 Worker 提供了 SSL 证书。图片链接变成了 `https://...`，浏览器不再拦截，顺滑显示。
+1. 首先进入t2页面（首页点击右侧的 Images），这里是你的图床。
+2. 入一个box，在文本框中输入 mine_tuchuang ，然后点击 GO。
+3. 点击右上角 permission 按钮，设置权限，增加一个密码。
+4. 点击右上角 Use Scope 按钮，这里是防盗链设置，采用白名单策略，只有你允许的域名才可以访问这个图床的图片。 
 
-### 2. Serverless + R2 (无硬盘架构)
-- **以前**：你是在服务器的小硬盘上存东西。服务器一停，数据就断了。
-- **现在**：后端逻辑写进了 **Worker (大脑)**，数据存进了 **R2 (超大云硬盘)**。即使没有实体服务器，你的应用也是永久在线的。
+5. （可选）进入 bg box，可以上传一个bg.jpg,他会变成你的图床网站背景图片。
+6. （可选）左上角有一个 auto comppress 开关，开启后，上传的图片会自动压缩，使用前端算法实现，你可以点击图片查看大图，下方会显示图片的大小。
+7. （可选）左上角有一个 quick delete 开关，开启后，可以连续的点击图片的删除按钮，而不需要有确认窗口。
 
-### 3. 边缘头信息重写 (解决图床 Referrer 问题)
-你在代码 `src/index.js` 中可以看到我们显式设置了：
-`Access-Control-Allow-Origin: *` 和 `Referrer-Policy: no-referrer`。这些是在 Cloudflare 的全球边缘节点上直接注入的，确保了无论在哪种网页环境下，图片都能成功跨域加载。
+
+关于权限：
+> - 每个 box 使用单独的密码,但是你使用一个新 box 的时候,如果他不是第一个,那么你需要输入第一个 box 的密码来创建新密码。  
+> - 你的密码会在你的 bucket 里面显示为一个文件，如果你忘记了，可以去 bucket 中查看。
+> - 密码会自动保存到你的localStorage中，这样你就不需要每次输入密码了。
+
+关于box：
+> - box 可以简单理解成文件夹，这个图窗支持很多个文件夹，每个文件夹都是独立的，
+> - 如果有一个 box 你没有设置过密码，那么任何人都可以在这个box上传或下载，但是由于防盗链的限制，它并不能用作其他地方的图床。
+> - 如果你设置过box的密码，那么只有你设置的密码才能修改这个box，比如说上传图片或者删除图片。
+
+关于防盗链：
+> - 防盗链是通过白名单策略实现的，你可以在 Use Scope 中设置允许的域名，只有这些域名才能访问你的图床的图片。（所以有的时候他甚至会把自己也拦截掉，导致你看不到图片）
+> - 你也可以关闭防盗链功能这样它就是一个任何网站都可以使用的图床。
