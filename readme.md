@@ -37,6 +37,7 @@ echo "服务已启动，请访问 http://<你的服务器ip>:3000 使用剪切�
 
 
 docker部署：参考 [allnode_version](allnode_version/README.md)  
+cf workers部署：参考 [cf_version](cf_version/README.md)
 
 
 
