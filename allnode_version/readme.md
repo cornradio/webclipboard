@@ -1,79 +1,37 @@
 
 
-# quick test
-```
-node api.js
+# docker
+
+[dockerhub](https://hub.docker.com/r/kasusa/webclipboard-v2.0)
+
+## 简单部署
+```shell
+docker run -dp 8080:3000 kasusa/webclipboard-v2.0
+# 可选国内镜像(更新不定期,可能有延后)
+registry.cn-hangzhou.aliyuncs.com/aaas-images/webclipboard-v2.0
 ```
 
-# first run (ubuntu)
+浏览器访问 `http://<服务器ip>:8080` 即可使用webclip  
+如果需要自行编译其他架构： 请进入 `allnode_version\` 文件夹 ，装好node后执行 `docker build .`
 
-install node
-```bash
-sudo apt install nodejs
-sudo apt install npm
-```
-install dependencies
-```bash
-sudo -i
+## 自定义data位置部署
 
-npm install express
-npm install cors
-npm install multer
-```
+```SH
+# 创建目录用于存放数据,方便以后升级
+mkdir -p /home/webclipboard/txts /home/webclipboard/imgs
 
-run
-```bash
-node api.js
+# 可以自行放置一个 imgs/bg/bg.jpg 会被用来当做images功能的背景图片
+docker run -d -p 8080:3000 \
+-v /home/webclipboard/txts:/home/node/app/public/txts \
+-v /home/webclipboard/imgs:/home/node/app/public/images \
+kasusa/webclipboard-v2.0
 ```
 
-# normal run 
-use screen
-```bash
-screen -S webPasteApi
-cd /home/webclipboard/allnode_version
-node api.js
-```
-
-# API
-Get
-```
-http://127.0.0.1:3000/api/readfile/{any.txt}
-```
+浏览器访问 `http://<服务器ip>:8080` 即可使用webclip
 
 
-Post
-```
-http://127.0.0.1:3000/api/writefile/{any.txt}
-```
-Post body (json)
-```
-{
-  "content": "这是要写入文件的内容。"
-}
-```
-
-## docker build 
-```
-docker build -t kasusa/webclipboard-v2.0:20251201 .
-docker run -d -p 80:3000  kasusa/webclipboard-v2.0:20251201
-docker push kasusa/webclipboard-v2.0:20251201
-docker tag kasusa/webclipboard-v2.0:20251201 kasusa/webclipboard-v2.0:latest
-docker push kasusa/webclipboard-v2.0:latest
-```
-
-## docker save to file
-```
-docker save -o webclipboard.tar kasusa/webclipboard-v2.0:20250111
+## 本地部署
+下载 [tar包](https://github.com/cornradio/webclipboard/blob/main/allnode_version/webclipboard_v2.tar)，本地加载tar包，加载后可以使用上述方法之一部署
+```shell
 docker load -i webclipboard.tar
-```
-
-## docker run 
-可以使用 -v 参数来挂载本地目录到容器中 ， 这样即使更新版本，也会保留文件  
-并且更方便从外部查看和修改
-
-```
-docker run -d -p 8000:3000 `
-    -v "C:\Users\Admin\Downloads\test\txt:/home/node/app/public/txts" `
-    -v "C:\Users\Admin\Downloads\test\img:/home/node/app/public/images" `
-    kasusa/webclipboard-v2.0:20250111
 ```
