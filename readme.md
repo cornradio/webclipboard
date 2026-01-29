@@ -42,15 +42,22 @@ cf workers部署：参考 [cf_version](cf_version/README.md)
 
 
 ## 截图
-![image](https://github.com/user-attachments/assets/f489f649-71de-4ff1-bfff-adadece727c5)
-
-
 <div align="center">
-	<img src="images/image2.jpg" alt="Editor" width="500">
+  <table>
+    <tr>
+      <td width="70%">
+        <img src="https://github.com/user-attachments/assets/f489f649-71de-4ff1-bfff-adadece727c5" alt="Image 1">
+      </td>
+      <td width="30%">
+        <img src="images/image2.jpg" alt="Editor">
+      </td>
+    </tr>
+  </table>
 </div>
 
-![image](https://github.com/user-attachments/assets/ba174d9c-311a-4b44-8171-61a7a4c71aef)
-
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/ba174d9c-311a-4b44-8171-61a7a4c71aef" alt="Image 3" width="800">
+</div>
 
 ## 历史记录功能
 - 使用 `localStorage` 保存本地访问过的文件名历史记录
@@ -69,12 +76,17 @@ curl \
 -d "{\"content\": \"$(awk '{printf "%s\\n", $0}' a.json | sed 's/"/\\"/g')\"}"
 ```
 
-## 更新日志
-### 2026-01-29
-增加了图片、日记插件。
-增加了全屏笔记功能。
-
 ## 类似tool
 https://fagedongxi.com/  
 https://getnote.top/  
 https://hackmd.io/?nav=overview
+
+## 更新日志
+### 2026-01-29
+- 增加了图片、日记插件。（可以选择关闭）
+- 增加了全屏笔记功能。（快捷键 F）
+- 增加了快速跳转到文件名功能（快捷键 T）
+
+<img width="2054" height="1335" alt="Image" src="https://github.com/user-attachments/assets/3cbd05ce-f568-4843-b006-6a7139ee8471" />
+
+
