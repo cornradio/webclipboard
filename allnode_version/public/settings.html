@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Web Pasteboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.5s;
+        }
+
+        body.dark-mode {
+            background-color: #2d2d2d;
+            color: #fff;
+        }
+
+        .settings-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: background-color 0.5s;
+        }
+
+        .settings-card.dark-mode {
+            background-color: #444;
+            color: #fff;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .dark-mode .setting-item {
+            border-bottom-color: #555;
+        }
+
+        .setting-info h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .setting-info p {
+            margin: 5px 0 0;
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* iOS Style Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #34c759;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+
+        .back-btn {
+            display: block;
+            padding: 12px;
+            background-color: #eee;
+            color: #333;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #ddd;
+        }
+
+        .dark-mode .back-btn {
+            background-color: #555;
+            color: #fff;
+        }
+
+        .dark-mode .back-btn:hover {
+            background-color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="settings-card" id="settingsCard">
+        <h1><i class="fas fa-cog"></i> Settings</h1>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <h3>Note Calendar</h3>
+                <p>Show calendar assistant in top right</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="enableCalendar">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <h3>Note Image Viewer</h3>
+                <p>Show image assistant in top right</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="enableImageViewer">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <h3>Fullscreen Button</h3>
+                <p>Show toggle button in bottom left</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="enableFullscreen">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <h3>Dark Mode</h3>
+                <p>System wide dark theme</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <a href="index.html" class="back-btn">Back to Clipboard</a>
+    </div>
+
+    <script>
+        // Load settings
+        function loadSettings() {
+            const calendar = localStorage.getItem('enableCalendar') !== 'false'; // Default true
+            const imageViewer = localStorage.getItem('enableImageViewer') !== 'false'; // Default true
+            const fullscreen = localStorage.getItem('enableFullscreen') !== 'false'; // Default true
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+
+            document.getElementById('enableCalendar').checked = calendar;
+            document.getElementById('enableImageViewer').checked = imageViewer;
+            document.getElementById('enableFullscreen').checked = fullscreen;
+            document.getElementById('darkModeToggle').checked = darkMode;
+
+            if (darkMode) {
+                applyDarkMode(true);
+            }
+        }
+
+        function applyDarkMode(isDark) {
+            document.body.classList.toggle('dark-mode', isDark);
+            document.getElementById('settingsCard').classList.toggle('dark-mode', isDark);
+        }
+
+        // Save settings
+        document.getElementById('enableCalendar').onchange = function () {
+            localStorage.setItem('enableCalendar', this.checked);
+        };
+
+        document.getElementById('enableImageViewer').onchange = function () {
+            localStorage.setItem('enableImageViewer', this.checked);
+        };
+
+        document.getElementById('enableFullscreen').onchange = function () {
+            localStorage.setItem('enableFullscreen', this.checked);
+        };
+
+        document.getElementById('darkModeToggle').onchange = function () {
+            localStorage.setItem('darkMode', this.checked);
+            applyDarkMode(this.checked);
+        };
+
+        loadSettings();
+    </script>
+</body>
+
+</html>

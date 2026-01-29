@@ -1406,6 +1406,15 @@
     // auto do
     //set boxname from localstorage
     var boxname = localStorage.getItem('image-box-name');
+
+    // Check URL parameters for box name
+    const urlParams = new URLSearchParams(window.location.search);
+    const boxParam = urlParams.get('box') || urlParams.get('txt');
+    if (boxParam) {
+        boxname = boxParam;
+        console.log('From URL parameter, box name: ' + boxname);
+    }
+
     if (boxname) {
         document.getElementById('boxname').value = boxname;
     }

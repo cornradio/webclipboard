@@ -59,12 +59,6 @@
             justify-content: center;
         }
 
-        /* 在小屏幕下隐藏全屏按钮 */
-        @media (max-width: 1200px) {
-            .fullscreen-btn {
-                display: none;
-            }
-        }
 
         select {
             position: fixed;
@@ -119,13 +113,46 @@
         }
 
         textarea.big {
-            width: 130%;
-            height: 90vh;
-            font-size: 14px;
-            transform: translateX(35%);
-            padding: 1em;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 2000;
+            margin: 0;
+            border-radius: 0;
+            transform: none !important;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
+        .shrink-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fafafa;
+            color: rgb(86, 86, 86);
+            border: none;
+            cursor: pointer;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 2001;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .shrink-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .shrink-btn.dark-mode {
+            background-color: #444;
+            color: #fff;
+        }
 
         textarea.dark-mode {
             background-color: #444;
@@ -266,6 +293,20 @@
                 color: #666;
             }
 
+            #SettingsBtn::before {
+                content: "\f013";
+                color: #666;
+            }
+
+            #toastContainer {
+                bottom: auto;
+                top: 20px;
+                right: 0;
+                left: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
         }
 
         /* buttons */
@@ -315,6 +356,7 @@
             right: 20px;
             z-index: 9999;
             transition: all 0.3s ease-in-out;
+            pointer-events: none;
         }
 
         .toast {
@@ -329,6 +371,7 @@
             opacity: 0;
             animation: float-in 0.3s ease-in-out;
             /* transition: 0.3s ease-in-out; */
+            pointer-events: auto;
         }
 
         .toast.dark-mode {
@@ -401,12 +444,16 @@
                 <button id="images" onclick="javascript:location.href = 't2.html'">Images<i>Ctrl + I</i>
                 </button>
                 <button id="toggleMode">Dark Mode<i>Ctrl + B</i></button>
+                <button id="SettingsBtn" onclick="window.location.href='settings.html'">Settings<i>Ctrl + ,</i></button>
             </div>
         </div>
 
         <div id="toastContainer"></div>
         <button class="fullscreen-btn" id="fullscreenBtn" title="Toggle Fullscreen">
             <i class="fas fa-expand"></i>
+        </button>
+        <button class="shrink-btn" id="shrinkBtn" title="Exit Fullscreen">
+            <i class="fas fa-compress"></i>
         </button>
     </div>
 
@@ -434,7 +481,22 @@
             console.log('Dark mode saved to localStorage: ' + darkMode);
         }
         function toggleBigMode() {
-            document.getElementById('fileContent').classList.toggle('big');
+            const textarea = document.getElementById('fileContent');
+            const shrinkBtn = document.getElementById('shrinkBtn');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+
+            textarea.classList.toggle('big');
+            const isBig = textarea.classList.contains('big');
+
+            if (isBig) {
+                shrinkBtn.style.display = 'flex';
+                if (isDarkMode) shrinkBtn.classList.add('dark-mode');
+                else shrinkBtn.classList.remove('dark-mode');
+                document.body.style.overflow = 'hidden';
+            } else {
+                shrinkBtn.style.display = 'none';
+                document.body.style.overflow = '';
+            }
         }
         function CopyAll() {
             document.getElementById('fileContent').select();
@@ -517,6 +579,21 @@
 
         // Keyboard event listener 
         document.addEventListener('keydown', function (event) {
+            const isInputFocused = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+
+            if (!isInputFocused) {
+                if (event.key === 't' || event.key === 'T') {
+                    event.preventDefault();
+                    const fileNameInput = document.getElementById('fileName');
+                    fileNameInput.value = '';
+                    fileNameInput.focus();
+                }
+                if (event.key === 'f' || event.key === 'F') {
+                    event.preventDefault();
+                    toggleBigMode();
+                }
+            }
+
             if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
                 event.preventDefault();
                 toggleDarkMode();
@@ -538,6 +615,10 @@
             if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'C') {
                 event.preventDefault();
                 CopyAll();
+            }
+            if ((event.ctrlKey || event.metaKey) && event.key === ',') {
+                event.preventDefault();
+                window.location.href = 'settings.html';
             }
             //sharebutton
             if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'S') {
@@ -685,6 +766,37 @@
         fullscreenBtn.addEventListener('click', function () {
             toggleBigMode();
         });
+
+        const shrinkBtn = document.getElementById('shrinkBtn');
+        shrinkBtn.addEventListener('click', function () {
+            toggleBigMode();
+        });
+    </script>
+    <script>
+        // Conditionally load plugins based on settings
+        function loadPlugins() {
+            const calendarEnabled = localStorage.getItem('enableCalendar') !== 'false';
+            const imageViewerEnabled = localStorage.getItem('enableImageViewer') !== 'false';
+            const fullscreenEnabled = localStorage.getItem('enableFullscreen') !== 'false';
+
+            if (calendarEnabled) {
+                const script = document.createElement('script');
+                script.src = 'mynote.js';
+                document.body.appendChild(script);
+            }
+
+            if (imageViewerEnabled) {
+                const script = document.createElement('script');
+                script.src = 'mypic.js';
+                document.body.appendChild(script);
+            }
+
+            const fsBtn = document.getElementById('fullscreenBtn');
+            if (fsBtn) {
+                fsBtn.style.display = fullscreenEnabled ? 'flex' : 'none';
+            }
+        }
+        loadPlugins();
     </script>
 </body>
 

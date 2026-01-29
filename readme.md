@@ -71,9 +71,8 @@ curl \
 
 ## 更新日志
 ### 2026-01-29
-新增了一个油猴扩展，可以快速的把webclip变成你的日记本： daily-note.js 
-<img width="2194" height="1524" alt="图片" src="https://github.com/user-attachments/assets/6781b3b0-2f80-490c-9d6c-0225bc3669b1" />
-
+增加了图片、日记插件。
+增加了全屏笔记功能。
 
 ## 类似tool
 https://fagedongxi.com/  
